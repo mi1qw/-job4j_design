@@ -87,7 +87,7 @@ class Go {
 
         int x = 8;
         do {
-            controllQuality.checkFood(1);
+            controllQuality.resort(1);
 
             System.out.println("   Warehouse");
             warehouse.store.forEach(Food -> {

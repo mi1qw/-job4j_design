@@ -1,8 +1,6 @@
 package ru.job4j.lspfood;
 
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 enum N {
@@ -19,7 +17,7 @@ class ControllQuality {
         this.virtualDate = Calendar.getInstance();
     }
 
-    void checkFood(int dayPlus) {
+    void resort(int dayPlus) {
         virtualDate.add(Calendar.DAY_OF_MONTH, dayPlus);
         System.out.println(virtualDate.get(Calendar.DAY_OF_MONTH)
                 + " " + ((int) 1 + virtualDate.get(Calendar.MONTH))
