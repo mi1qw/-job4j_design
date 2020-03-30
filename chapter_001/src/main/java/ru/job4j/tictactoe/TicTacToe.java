@@ -3,6 +3,8 @@ package ru.job4j.tictactoe;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -12,29 +14,9 @@ import java.util.function.Predicate;
 //
 //  Давайте сразу напишем тесты для проверки этой логики.
 
-//class Logic {
-//    int size;
-//    Figure[] figures;                         // массив всего поля
-//    int index = 0;                                  // порядковыйй номер ячейки
-//
-
-//}
-
-//инит
-//вывод
-//логика
-
-//ввод
-
 //    |X|O|X|
 //    |O|X|O|
 //    |X|O|X|
-//
-//
-//    |O|O|X|
-//    |O|O|X|
-//    |O|O|X|
-//
 //
 //    |O|O|X|O|O|
 //    |X|X|X|X|X|
@@ -42,25 +24,6 @@ import java.util.function.Predicate;
 //    |O|O|X|O|O|
 //    |O|O|X|O|O|
 //
-
-
-interface Figure {
-    default boolean movable() {
-        return true;
-    }
-
-    Cell position();
-
-    Cell[] way(Cell source, Cell dest);
-
-    default String icon() {
-        return String.format(
-                "%s.png", this.getClass().getSimpleName()
-        );
-    }
-
-    Figure copy(Cell dest);
-}
 
 
 class Cell {
@@ -149,21 +112,75 @@ class Logic3T {
     }
 
     public boolean isWinnerX() {
-        return this.fillBy(Figure3T::hasMarkX, 0, 0, 1, 0)
-                || this.fillBy(Figure3T::hasMarkX, 0, 0, 0, 1)
-                || this.fillBy(Figure3T::hasMarkX, 0, 0, 1, 1)
-                || this.fillBy(Figure3T::hasMarkX, this.table.length - 1, 0, -1, 1);
+        //return this.fillBy(Figure3T::hasMarkX, 0, 0, 1, 0)
+        //        || this.fillBy(Figure3T::hasMarkX, 0, 0, 0, 1)
+        //        || this.fillBy(Figure3T::hasMarkX, 0, 0, 1, 1)
+        //        || this.fillBy(Figure3T::hasMarkX, this.table.length - 1, 0, -1, 1);
+        boolean res;
+        res = this.fillBy(Figure3T::hasMarkX, this.table.length - 1, 0, -1, 1);
+        res |= this.fillBy(Figure3T::hasMarkX, 0, 0, 1, 1);
+        for (int x = 0; x != table.length; ++x) {
+            res |= this.fillBy(Figure3T::hasMarkX, x, 0, 0, 1);
+        }
+        for (int y = 0; y != table.length; ++y) {
+            res |= this.fillBy(Figure3T::hasMarkX, 0, y, 1, 0);
+        }
+        return res;
     }
 
     public boolean isWinnerO() {
-        return this.fillBy(Figure3T::hasMarkO, 0, 0, 1, 0)
-                || this.fillBy(Figure3T::hasMarkO, 0, 0, 0, 1)
-                || this.fillBy(Figure3T::hasMarkO, 0, 0, 1, 1)
-                || this.fillBy(Figure3T::hasMarkO, this.table.length - 1, 0, -1, 1);
+        //return this.fillBy(Figure3T::hasMarkO, 0, 0, 1, 0)
+        //        || this.fillBy(Figure3T::hasMarkO, 0, 0, 0, 1)
+        //        || this.fillBy(Figure3T::hasMarkO, 0, 0, 1, 1)
+        //        || this.fillBy(Figure3T::hasMarkO, this.table.length - 1, 0, -1, 1);
+        boolean res;
+        res = this.fillBy(Figure3T::hasMarkO, this.table.length - 1, 0, -1, 1);
+        res |= this.fillBy(Figure3T::hasMarkO, 0, 0, 1, 1);
+        for (int x = 0; x != table.length; ++x) {
+            res |= this.fillBy(Figure3T::hasMarkO, x, 0, 0, 1);
+        }
+        for (int y = 0; y != table.length; ++y) {
+            res |= this.fillBy(Figure3T::hasMarkO, 0, y, 1, 0);
+        }
+        return res;
     }
 
+    //public boolean isWin() {
+    //    int[][] table = this.convert();
+    //    boolean result = false;
+    //    int line = 0;
+    //
+    //    for (int row = 0; row < size; row++) {
+    //        for (int cell = 0; cell < size; cell++) {
+    //            line += table[row][cell];
+    //            if (line == size) {
+    //                return true;
+    //            }
+    //        }
+    //        line = 0;
+    //    }
+    //
+    //    for (int cell = 0; cell < size; cell++) {
+    //        for (int row = 0; row < size; row++) {
+    //            line += table[row][cell];
+    //            if (line == size) {
+    //                return true;
+    //            }
+    //        }
+    //        line = 0;
+    //    }
+    //    return result;
+    //}
+
     public boolean hasGap() {
-        return true;
+        for (int y = 0; y != this.table.length; y++) {
+            for (int x = 0; x != this.table.length; x++) {
+                if (!isNotFree(x, y)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
 
@@ -177,11 +194,13 @@ class Player {
     String name;
     boolean mark;
     Logic3T logic;
+    int[][] marks;
 
     public Player(String name, boolean mark, Logic3T logic) {
         this.name = name;
         this.mark = mark;
         this.logic = logic;
+        marks = new int[logic.table.length][logic.table.length];
     }
 }
 
@@ -197,14 +216,14 @@ class Human extends Player implements HumanBot {
         boolean valid = true;
         String input;
         do {
-            System.out.print("Enter CELL xy : ");
+            System.out.print(this.name + ", Enter CELL xy : ");
             System.out.flush();
             input = getString();                // Чтение строки с клавиатуры
             x = Integer.parseInt(String.valueOf(input.charAt(0))) - 1;
             y = Integer.parseInt(String.valueOf(input.charAt(1))) - 1;
         } while (logic.isNotFree(x, y) && valid);
 
-        logic.table[x][y].take(true);
+        logic.table[x][y].take(this.mark);
     }
 
     String getString() throws IOException {
@@ -223,7 +242,15 @@ class Bot extends Player implements HumanBot {
 
     @Override
     public void inputXY() {
+        int x, y;
+        System.out.print(this.name + ", entered CELL xy: ");
+        do {
+            x = (int) (Math.random() * logic.table.length);
+            y = (int) (Math.random() * logic.table.length);
+        } while (logic.isNotFree(x, y));
+        System.out.println((int) (x + 1) + "" + (int) (y + 1));
 
+        logic.table[x][y].take(this.mark);
     }
 }
 //Класс TicTacToe - реализует визуальный компонент. Не волнуйтесь, если вы не понимаете большинство кода в этом классе.
@@ -236,6 +263,7 @@ public class TicTacToe {
     private final Figure3T[][] cells = new Figure3T[size][size];
     private final Logic3T logic = new Logic3T(cells);
     boolean mark;
+    List<HumanBot> playerList = new ArrayList<>();
 
     //private Figure3T buildRectangle(int x, int y, int size) {
     //    Figure3T rect = new Figure3T();
@@ -255,42 +283,24 @@ public class TicTacToe {
             }
         }
 
-        mark = (int) (1 + Math.random() * 2) == 1 ? true : false;
+        mark = (int) (1 + Math.random() * 2) == 1 ? true : false;   // если true, то markX
 
-        HumanBot player1 = new Human("Jek", mark, logic);
-        HumanBot player2 = new Bot("Bot", !mark, logic);
-        //((HumanBot) player1).inputXY();
+        playerList.add(new Human("Jek", mark, logic));
+        playerList.add(new Bot("Bot", !mark, logic));
 
-        player1.inputXY();
+        //Iterator<HumanBot> i = playerList.iterator();
 
-        //inputXY(true);
-        buildGrid();
-        checkWinner();
-        //if (logic.isWinnerX()) {
-        //    System.out.println("XXXXXXXXXXXX");
-        //}
-
-        //inputXY(true);
-        buildGrid();
-        checkWinner();
-        //if (logic.isWinnerX()) {
-        //    System.out.println("XXXXXXXXXXXX");
-        //}
-
-        //inputXY(true);
-        buildGrid();
-        checkWinner();
-        //if (logic.isWinnerX()) {
-        //    System.out.println("XXXXXXXXXXXX");
-        //}
-
-        //inputXY(true);
-        checkWinner();
-        buildGrid();
-        //if (logic.isWinnerX()) {
-        //    System.out.println("XXXXXXXXXXXX");
-        //}
-
+        int n = -1;
+        while (true) {
+            n = (++n) % playerList.size();
+            //System.out.println(n);
+            playerList.get(n).inputXY();
+            buildGrid();
+            System.out.println();
+            if (checkWinner() || !checkState()) {
+                break;
+            }
+        }
     }
 
     private void buildGrid() {
@@ -318,10 +328,6 @@ public class TicTacToe {
         }
         //return panel;
     }
-
-    //    |O|O|X|
-    //    |O|O|X|
-    //    |O|O|X|
 
     //@Override
     //public void start(Stage stage) {
@@ -391,14 +397,18 @@ public class TicTacToe {
         return gap;
     }
 
-    private void checkWinner() {
+    public boolean checkWinner() {
+        boolean res = false;
         if (this.logic.isWinnerX()) {
             //this.showAlert("Победили Крестики! Начните новую Игру!");
             System.out.println("Победили Крестики! Начните новую Игру!");
+            res = true;
         } else if (this.logic.isWinnerO()) {
             //this.showAlert("Победили Нолики! Начните новую Игру!");
             System.out.println("Победили Нолики! Начните новую Игру!");
+            res = true;
         }
+        return res;
     }
 
     //private EventHandler<MouseEvent> buildMouseEvent(Group panel) {
