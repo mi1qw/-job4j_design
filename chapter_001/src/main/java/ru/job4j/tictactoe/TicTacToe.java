@@ -1,5 +1,8 @@
 package ru.job4j.tictactoe;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -121,10 +124,14 @@ class Figure3T {
 
 
 class Logic3T {
-    private final Figure3T[][] table;
+    final Figure3T[][] table;
 
     public Logic3T(Figure3T[][] table) {
         this.table = table;
+    }
+
+    boolean isNotFree(int x, int y) {
+        return table[x][y].hasMarkX() || table[x][y].hasMarkO();
     }
 
     public boolean fillBy(Predicate<Figure3T> predicate, int startX, int startY, int deltaX, int deltaY) {
@@ -160,6 +167,65 @@ class Logic3T {
     }
 }
 
+
+interface HumanBot {
+    void inputXY() throws IOException;
+}
+
+
+class Player {
+    String name;
+    boolean mark;
+    Logic3T logic;
+
+    public Player(String name, boolean mark, Logic3T logic) {
+        this.name = name;
+        this.mark = mark;
+        this.logic = logic;
+    }
+}
+
+
+class Human extends Player implements HumanBot {
+    public Human(String name, boolean mark, Logic3T logic) {
+        super(name, mark, logic);
+    }
+
+    @Override
+    public void inputXY() throws IOException {
+        int x, y;
+        boolean valid = true;
+        String input;
+        do {
+            System.out.print("Enter CELL xy : ");
+            System.out.flush();
+            input = getString();                // Чтение строки с клавиатуры
+            x = Integer.parseInt(String.valueOf(input.charAt(0))) - 1;
+            y = Integer.parseInt(String.valueOf(input.charAt(1))) - 1;
+        } while (logic.isNotFree(x, y) && valid);
+
+        logic.table[x][y].take(true);
+    }
+
+    String getString() throws IOException {
+        InputStreamReader isr = new InputStreamReader(System.in);
+        BufferedReader br = new BufferedReader(isr);
+        String s = br.readLine();
+        return s;
+    }
+}
+
+
+class Bot extends Player implements HumanBot {
+    public Bot(String name, boolean mark, Logic3T logic) {
+        super(name, mark, logic);
+    }
+
+    @Override
+    public void inputXY() {
+
+    }
+}
 //Класс TicTacToe - реализует визуальный компонент. Не волнуйтесь, если вы не понимаете большинство кода в этом классе.
 //        Дальше в курсе будет разобраны все эти элементы. Здесь просто скопируйте этот код.
 
@@ -169,6 +235,7 @@ public class TicTacToe {
     private final int size = 3;
     private final Figure3T[][] cells = new Figure3T[size][size];
     private final Logic3T logic = new Logic3T(cells);
+    boolean mark;
 
     //private Figure3T buildRectangle(int x, int y, int size) {
     //    Figure3T rect = new Figure3T();
@@ -180,9 +247,81 @@ public class TicTacToe {
     //    rect.setStroke(Color.BLACK);
     //    return rect;
     //}
-    public void start() {
+    public void start() throws IOException {
+
+        for (int y = 0; y != this.size; y++) {
+            for (int x = 0; x != this.size; x++) {
+                cells[x][y] = new Figure3T();
+            }
+        }
+
+        mark = (int) (1 + Math.random() * 2) == 1 ? true : false;
+
+        HumanBot player1 = new Human("Jek", mark, logic);
+        HumanBot player2 = new Bot("Bot", !mark, logic);
+        //((HumanBot) player1).inputXY();
+
+        player1.inputXY();
+
+        //inputXY(true);
+        buildGrid();
+        checkWinner();
+        //if (logic.isWinnerX()) {
+        //    System.out.println("XXXXXXXXXXXX");
+        //}
+
+        //inputXY(true);
+        buildGrid();
+        checkWinner();
+        //if (logic.isWinnerX()) {
+        //    System.out.println("XXXXXXXXXXXX");
+        //}
+
+        //inputXY(true);
+        buildGrid();
+        checkWinner();
+        //if (logic.isWinnerX()) {
+        //    System.out.println("XXXXXXXXXXXX");
+        //}
+
+        //inputXY(true);
+        checkWinner();
+        buildGrid();
+        //if (logic.isWinnerX()) {
+        //    System.out.println("XXXXXXXXXXXX");
+        //}
 
     }
+
+    private void buildGrid() {
+        //Group panel = new Group();
+        for (int y = 0; y != this.size; y++) {
+            for (int x = 0; x != this.size; x++) {
+                System.out.print("|");
+                if (cells[x][y].hasMarkX()) {
+                    System.out.print("X");
+                    continue;
+                }
+                if (cells[x][y].hasMarkO()) {
+                    System.out.print("O");
+                    continue;
+                }
+                System.out.print(" ");
+
+                //Figure3T rect = this.buildRectangle(x, y, 50);        построить поле
+                //this.cells[y][x] = rect;
+                //panel.getChildren().add(rect);
+                //rect.setOnMouseClicked(this.buildMouseEvent(panel));
+            }
+            System.out.print("|");
+            System.out.println();
+        }
+        //return panel;
+    }
+
+    //    |O|O|X|
+    //    |O|O|X|
+    //    |O|O|X|
 
     //@Override
     //public void start(Stage stage) {
@@ -204,12 +343,12 @@ public class TicTacToe {
     //stage.show();
     //}
 
-    public static void main(String[] args) {
-        new TicTacToe();
+    public static void main(String[] args) throws IOException {
+        new TicTacToe().start();
     }
 
     private void buildMarkO(double x, double y, int size) {
-        System.out.print("X");
+        System.out.print("O");
         //Group group = new Group();
         //int radius = size / 2;
         //Circle circle = new Circle(x + radius, y + radius, radius - 10);
@@ -220,7 +359,7 @@ public class TicTacToe {
     }
 
     private void buildMarkX(double x, double y, int size) {
-        System.out.print("O");
+        System.out.print("X");
         //Group group = new Group();
         //group.getChildren().addAll(
         //        new Line(
@@ -282,19 +421,5 @@ public class TicTacToe {
     //        }
     //    };
     //}
-
-    private void buildGrid() {
-        //Group panel = new Group();
-        for (int y = 0; y != this.size; y++) {
-            for (int x = 0; x != this.size; x++) {
-                System.out.println();
-                //Figure3T rect = this.buildRectangle(x, y, 50);        построить поле
-                //this.cells[y][x] = rect;
-                //panel.getChildren().add(rect);
-                //rect.setOnMouseClicked(this.buildMouseEvent(panel));
-            }
-        }
-        //return panel;
-    }
 }
 
