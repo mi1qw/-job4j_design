@@ -8,12 +8,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-//  public boolean isWinnerX() -проверяет есть ли в поле выигрышные комбинации для Крестика.
-//  public boolean isWinnerO()-проверяет есть ли в поле выигрышные комбинации для Нолика.
-//  public boolean hasGap()-проверяет,если ли пустые клетки для новых ходов.
-//
-//  Давайте сразу напишем тесты для проверки этой логики.
-
 //    |X|O|X|
 //    |O|X|O|
 //    |X|O|X|
@@ -145,33 +139,6 @@ class Logic3T {
         return res;
     }
 
-    //public boolean isWin() {
-    //    int[][] table = this.convert();
-    //    boolean result = false;
-    //    int line = 0;
-    //
-    //    for (int row = 0; row < size; row++) {
-    //        for (int cell = 0; cell < size; cell++) {
-    //            line += table[row][cell];
-    //            if (line == size) {
-    //                return true;
-    //            }
-    //        }
-    //        line = 0;
-    //    }
-    //
-    //    for (int cell = 0; cell < size; cell++) {
-    //        for (int row = 0; row < size; row++) {
-    //            line += table[row][cell];
-    //            if (line == size) {
-    //                return true;
-    //            }
-    //        }
-    //        line = 0;
-    //    }
-    //    return result;
-    //}
-
     public boolean hasGap() {
         for (int y = 0; y != this.table.length; y++) {
             for (int x = 0; x != this.table.length; x++) {
@@ -212,16 +179,24 @@ class Human extends Player implements HumanBot {
 
     @Override
     public void inputXY() throws IOException {
-        int x, y;
+        int x = 0;
+        int y = 0;
         boolean valid = true;
         String input;
         do {
-            System.out.print(this.name + ", Enter CELL xy : ");
-            System.out.flush();
-            input = getString();                // Чтение строки с клавиатуры
-            x = Integer.parseInt(String.valueOf(input.charAt(0))) - 1;
-            y = Integer.parseInt(String.valueOf(input.charAt(1))) - 1;
-        } while (logic.isNotFree(x, y) && valid);
+            try {
+                System.out.print(this.name + ", Enter CELL xy: ");
+                System.out.flush();
+                input = getString();                // Чтение строки с клавиатуры
+                x = Integer.parseInt(String.valueOf(input.charAt(0))) - 1;
+                y = Integer.parseInt(String.valueOf(input.charAt(1))) - 1;
+                if (x >= 0 && x < logic.table.length && y >= 0 && y < logic.table.length) {
+                    valid = false;
+                }
+            } catch (NumberFormatException e) {
+            } catch (StringIndexOutOfBoundsException e) {
+            }
+        } while (valid || logic.isNotFree(x, y));
 
         logic.table[x][y].take(this.mark);
     }
@@ -276,31 +251,75 @@ public class TicTacToe {
     //    return rect;
     //}
     public void start() throws IOException {
-
-        for (int y = 0; y != this.size; y++) {
-            for (int x = 0; x != this.size; x++) {
-                cells[x][y] = new Figure3T();
-            }
-        }
-
-        mark = (int) (1 + Math.random() * 2) == 1 ? true : false;   // если true, то markX
-
-        playerList.add(new Human("Jek", mark, logic));
-        playerList.add(new Bot("Bot", !mark, logic));
-
-        //Iterator<HumanBot> i = playerList.iterator();
-
-        int n = -1;
         while (true) {
-            n = (++n) % playerList.size();
-            //System.out.println(n);
-            playerList.get(n).inputXY();
-            buildGrid();
-            System.out.println();
-            if (checkWinner() || !checkState()) {
-                break;
+            for (int y = 0; y != this.size; y++) {
+                for (int x = 0; x != this.size; x++) {
+                    cells[x][y] = new Figure3T();
+                }
+            }
+            mark = (int) (1 + Math.random() * 2) == 1 ? true : false;   // если true, то markX
+            playerList.clear();
+
+            switch (menu()) {
+                case 1:
+                    playerList.add(new Human("Jek", mark, logic));
+                    playerList.add(new Bot("Bot", !mark, logic));
+                    break;
+                case 2:
+                    playerList.add(new Human("Jek", mark, logic));
+                    playerList.add(new Human("Ann", !mark, logic));
+                    break;
+                case 3:
+                    playerList.add(new Bot("Bot_1", mark, logic));
+                    playerList.add(new Bot("Bot_2", !mark, logic));
+                default:
+            }
+
+            int n = -1;
+            while (checkState()) {
+                n = (++n) % playerList.size();
+                playerList.get(n).inputXY();
+                buildGrid();
+                System.out.println();
+                if (checkWinner(((Player) playerList.get(n)).name)) {
+                    break;
+                }
             }
         }
+    }
+
+    int menu() throws IOException {
+        System.out.println();
+        System.out.println("Варианты игры:");
+        System.out.println("1 бот-человек");
+        System.out.println("2 человек-человек");
+        System.out.println("3 бот-бот");
+        System.out.println();
+        System.out.print("Cделайте выбор - ");
+
+        boolean valid = true;
+        int n = 0;
+        do {
+            try {
+                String input = getString();
+                n = Integer.parseInt(String.valueOf(input));
+                if (n > 0 && n < 4) {
+                    valid = false;
+                } else {
+                    throw new NumberFormatException();
+                }
+            } catch (NumberFormatException e) {
+                System.out.print("Cделайте выбор - ");
+            }
+        } while (valid);
+        return n;
+    }
+
+    String getString() throws IOException {
+        InputStreamReader isr = new InputStreamReader(System.in);
+        BufferedReader br = new BufferedReader(isr);
+        String s = br.readLine();
+        return s;
     }
 
     private void buildGrid() {
@@ -397,15 +416,15 @@ public class TicTacToe {
         return gap;
     }
 
-    public boolean checkWinner() {
+    public boolean checkWinner(String name) {
         boolean res = false;
         if (this.logic.isWinnerX()) {
             //this.showAlert("Победили Крестики! Начните новую Игру!");
-            System.out.println("Победили Крестики! Начните новую Игру!");
+            System.out.println("Победитель Крестики - " + name + "!\n\nНачните новую Игру");
             res = true;
         } else if (this.logic.isWinnerO()) {
             //this.showAlert("Победили Нолики! Начните новую Игру!");
-            System.out.println("Победили Нолики! Начните новую Игру!");
+            System.out.println("Победитель Нолики - " + name + "!\n\nНачните новую Игру");
             res = true;
         }
         return res;
