@@ -16,14 +16,14 @@ public class AnalizyTest {
     @Test
     public void testingUnavailable() {
         Analizy a = new Analizy();
-        a.unavailable("./data/server.log", "./data/unavailable.csv");
+        a.unavailable("./data/server.csv", "./data/unavailable.csv");
         assertThat(expected, is(a.listout));
     }
 
     @Test
     public void compareWithSavedFile() {
         Analizy a = new Analizy();
-        a.unavailable("./data/server.log", "./data/unavailable.csv");
+        a.unavailable("./data/server.csv", "./data/unavailable.csv");
         a.listin.clear();
         a.readfile("./data/unavailable.csv");
         assertThat(expected, is(a.listin));

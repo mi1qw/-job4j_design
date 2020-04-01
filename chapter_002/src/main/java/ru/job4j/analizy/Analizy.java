@@ -38,7 +38,7 @@ public class Analizy {
     }
 
     public static void main(String[] args) {
-        new Analizy().unavailable("chapter_002/data/server.log", "chapter_002/data/unavailable.csv");
+        new Analizy().unavailable("chapter_002/data/server.csv", "chapter_002/data/unavailable.csv");
     }
 
     void readfile(String path) {
