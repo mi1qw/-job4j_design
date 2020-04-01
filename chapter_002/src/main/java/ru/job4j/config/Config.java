@@ -6,12 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
 
-//@FunctionalInterface
-//interface Search {
-//    String search(String string);
-//}
-
-
 public class Config {
     private final String path;
     private final Map<String, String> values = new HashMap<String, String>();
@@ -22,8 +16,6 @@ public class Config {
 
     String search(String string) {
         if (string.startsWith("##")) {
-            //if (string.startsWith("##") || string.isEmpty()) {
-            //System.out.println("1111111111111111");
             return "";
         }
         return string;
@@ -31,12 +23,10 @@ public class Config {
 
     public void load() {
         try (BufferedReader read = new BufferedReader(new FileReader(this.path))) {
-            //read.lines().map(n -> search(n)).filter(n -> !n.equals(""))
             read.lines().map(n -> search(n)).filter(n -> !n.isEmpty())
                     .forEach(n -> {
                         String[] str = n.split("=");
                         values.put(str[0], str[1]);
-                        //System.out.println(n);
                     });
         } catch (Exception e) {
         }
@@ -67,14 +57,3 @@ public class Config {
         System.out.println(c.values);
     }
 }
-
-//String path = "./data/pair_without_comment.properties";
-//data/pair_without_comment.properties
-//##
-//-- Это стандартный комментарий SQL
-/* многострочный комментарий
- * с вложенностью: /* вложенный блок комментария */
-//*/
-
-//String path = "chapter_002/data/pair_without_comment.properties";
-//pair_without_comment.properties
