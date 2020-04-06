@@ -15,25 +15,28 @@ public class Analizy {
     public void unavailable(String source, String target) {
         System.out.println();
 
-        readfile(source);
-
         String begin = "";
         String end;
-        for (String str : listin) {
-            String[] l = str.split(" ");
-            if (l[0].equals("500") || l[0].equals("400")) {
-                if (!unavailable) {
-                    begin = l[1];
-                    unavailable = true;
+        String line;
+        try (BufferedReader read = new BufferedReader(new FileReader(source))) {
+            while ((line = read.readLine()) != null) {
+                String[] l = line.split(" ");
+                if (l[0].equals("500") || l[0].equals("400")) {
+                    if (!unavailable) {
+                        begin = l[1];
+                        unavailable = true;
+                    }
+                } else if (unavailable) {
+                    end = l[1];
+                    unavailable = false;
+                    listout.add(begin + ";" + end);
                 }
-            } else if (unavailable) {
-                end = l[1];
-                unavailable = false;
-                listout.add(begin + ";" + end);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        listout.forEach(System.out::println);
 
+        listout.forEach(System.out::println);
         savefile(target);
     }
 
