@@ -33,16 +33,7 @@ public class AnalizyTest {
         File target = folder.newFile("unavailable.csv");
         a.unavailable("./data/server.csv", target.getAbsolutePath());
         a.listin.clear();
-        a.readfile("./data/unavailable.csv");
-        assertThat(expected, is(a.listin));
-    }
-
-    @Test
-    public void analizyTemp() throws IOException {
-        File target = folder.newFile("unavailable.csv");
-        Analizy a = new Analizy();
-        a.unavailable("./data/server.csv", target.getAbsolutePath());
-        a.listin.clear();
         a.readfile(target.getAbsolutePath());
+        assertThat(expected, is(a.listin));
     }
 }
