@@ -48,10 +48,18 @@ class PrintFiles implements FileVisitor<Path> {
 
 public class Search {
     public static void main(String[] args) throws IOException {
-        //Path start = Paths.get(".");
+        if (args.length != 2) {
+            throw new IllegalStateException("Root folder is null. Usage java -jar dir.jar ROOT_FOLDER.");
+        }
         //Path start = Paths.get("chapter_002");
-        Path start = Paths.get("chapter_002/src/main/java/ru/job4j/search/Search.java");
-        System.out.println(search(start, "java"));
+        //Path start = Paths.get("chapter_002/src/main/java/ru/job4j/search");
+        Path start = Paths.get(args[0]);
+        if (start.toFile().isFile()) {
+            throw new IllegalStateException("1st argument must be a folder. Usage java -jar dir.jar ROOT_FOLDER.");
+        }
+        //String ext = "java";
+        String ext = args[1];
+        System.out.println(search(start, ext));
     }
 
     public static List<String> search(Path root, String ext) throws IOException {
