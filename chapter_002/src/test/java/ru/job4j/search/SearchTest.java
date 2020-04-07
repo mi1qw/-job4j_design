@@ -15,7 +15,7 @@ public class SearchTest {
 
     @Test
     public void searchJavaInPath() throws IOException {
-        Path start = Paths.get("./src/main/java/ru/job4j/search/Search.java");
+        Path start = Paths.get("./src/main/java/ru/job4j/search/");
         assertThat(expected, is(Search.search(start, "java")));
     }
 }
