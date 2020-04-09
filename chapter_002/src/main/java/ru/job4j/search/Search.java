@@ -54,6 +54,9 @@ public class Search {
         //Path start = Paths.get("chapter_002");
         //Path start = Paths.get("chapter_002/src/main/java/ru/job4j/search");
         Path start = Paths.get(args[0]);
+        if (start.toFile().isFile()) {
+            throw new IllegalStateException("1st argument must be a folder. Usage java -jar dir.jar ROOT_FOLDER.");
+        }
         //String ext = "java";
         String ext = args[1];
         System.out.println(search(start, ext));
