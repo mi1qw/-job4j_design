@@ -1,0 +1,16 @@
+Human — начало
+BOT — Надо подумать
+Human — ещ1
+BOT — Надо подумать
+Human — стоп
+Human — хуман
+Human — продолжить
+BOT — Это разумно
+Human — спс
+BOT — Наверное
+Human — закончить
+BOT — @endchat
+Human — продолжение
+BOT — Наверное да, а может быть и нет:)
+Human — закончить
+BOT — @endchat
