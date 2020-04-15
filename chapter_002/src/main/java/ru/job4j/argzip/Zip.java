@@ -1,26 +1,18 @@
 package ru.job4j.argzip;
 
-import java.io.*;
-import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import static java.nio.file.FileVisitResult.CONTINUE;
 
 /**
  * Создание zip архива
  *
- * @throws Exception выбрасывается при полном отсутствии ключей проверка ключей делается отдельно.
- * Сначала проверяет все аргументы командной строки.
+ * @throws Exception выбрасывается при полном отсутствии ключей, проверка ключей делается отдельно.
+ * Сначала проверяютсят все аргументы командной строки.
  * Только при успешной верификации создаётся архив.
  */
-public class Zip {
+public final class Zip {
     public static void main(String[] args) throws Exception {
         if (args.length == 0) {
             throw new IllegalStateException("Usage java -jar dir.jar ROOT_FOLDER...");

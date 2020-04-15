@@ -13,7 +13,7 @@ class Wrongkey extends RuntimeException {
     /**
      * @param arg ошибочный ключ
      */
-    public Wrongkey(String arg) {
+    Wrongkey(String arg) {
         this.arg = arg;
     }
 }
@@ -31,7 +31,7 @@ class UseKeyDEO extends RuntimeException {
      * @param param Набор всех ключей командной строки
      *              для вывода текста- подсказки обязательных ключей в консоль
      */
-    public UseKeyDEO(Map<String, ArgKey> param) {
+    UseKeyDEO(Map<String, ArgKey> param) {
         this.param = param;
     }
 }

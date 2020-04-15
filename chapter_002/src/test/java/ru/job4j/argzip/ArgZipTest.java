@@ -40,12 +40,6 @@ public class ArgZipTest {
         new ArgZip(args).valid();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void withoutExclude() {
-        String[] args = "-d src/test/java/ru/job4j/argzip -e -o project.zip".split("\\s+");
-        new ArgZip(args).valid();
-    }
-
     @Test(expected = Wrongkey.class)
     public void wrongKey() {
         String[] args = "-z src/test/java/ru/job4j/argzip -e *.java -o project.zip".split("\\s+");
