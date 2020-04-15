@@ -8,10 +8,10 @@ import java.nio.file.Path;
 interface MatchextIn {
     /**
      * Интерфейс методов сравнения {@code matchM}.
-     * @param  file
-     *         файл который будет сравниваться
-     * @param pattern
-     *        маска искомого файла
+     *
+     * @param file    файл который будет сравниваться
+     * @param pattern маска искомого файла
+     * @return the boolean True -  совпадение
      */
     boolean matchM(Path file, String pattern);
 

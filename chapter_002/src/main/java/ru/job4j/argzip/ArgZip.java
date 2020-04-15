@@ -8,25 +8,24 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {@code ArgZip} класс для проверки командной строки
+ * {@code ArgZip} класс для проверки командной строки.
  */
 class ArgZip {
     /**
-     * numcons - минимальное кол-во обязательных аргументов
-     * valid - флаг верификации командной строки
-     * Map<String, ArgKey> param коллекция всех допустимых ключей, тип ArgKey
+     * @param numcons - минимальное кол-во обязательных аргументов
+     * @param valid - флаг верификации командной строки
+     * @param Map<String, ArgKey> param коллекция всех допустимых ключей, тип ArgKey
      */
+    private boolean valid = false;
+    private final int numcons = 2;
+    private final Map<String, ArgKey> param = new HashMap<>();
     private final String[] args;
-    private List<String> directory = new ArrayList<>();
-    private List<String> exclude = new ArrayList<>();
-    private List<String> output = new ArrayList<>();
-    boolean valid = false;
-    int numcons = 2;                                    // минимальное кол-во обязательных аргументов
-    Map<String, ArgKey> param = new HashMap<>();
+    private final List<String> directory = new ArrayList<>();
+    private final List<String> exclude = new ArrayList<>();
+    private final List<String> output = new ArrayList<>();
 
-    public ArgZip(String[] args) {
+    ArgZip(String[] args) {
         this.args = args;
-        //this.k = new ArgValid();
         param.put("-d", new ArgKey("-d", " Specify a path to a directory wich must be ziped",
                 directory, true, new ValidDirectory()));
         param.put("-e", new ArgKey("-e", " exclude files",
@@ -35,7 +34,7 @@ class ArgZip {
                 output, true, new ValidOutput()));
     }
 
-    public boolean valid() throws Wrongkey, UseKeyDEO {
+    boolean valid() throws Wrongkey, UseKeyDEO {
         if (!this.valid) {
             try {
                 ArgKey data = null;
@@ -49,11 +48,10 @@ class ArgZip {
                             throw new Wrongkey(args[n]);        // неправильный ключ в командной строке
                         }
                     }
-                    if (data != null) {
+                    if (data != null && data.valid.valid(args[n])) {
                         data.data.add(args[n]);
-                        if (!data.valid.valid(data)) {
-                            data.num = 0;
-                        }
+                    } else {
+                        data.num = 0;
                     }
                 }
                 if (complexValid()) {
@@ -89,9 +87,7 @@ class ArgZip {
      *
      * @return Колличество верифицированных аргументов должно быть не меньше кол-ва обязательных аргументов
      */
-    boolean complexValid() {
-        param.get("-e").valid.valid(param.get("-e"));
-
+    private boolean complexValid() {
         int num = 0;
         for (Map.Entry<String, ArgKey> n : param.entrySet()) {
             if (n.getValue().cons) {
@@ -101,15 +97,32 @@ class ArgZip {
         return num < numcons;
     }
 
-    public Path directory() {
+    /**
+     * Предполагается что в поле {@code data - directory} только одно значение поэтому
+     * получаем его  при помощи {@code get(0)}
+     *
+     * @return the path
+     */
+    Path directory() {
         return Paths.get(this.directory.get(0));
     }
 
-    public List<String> exclude() {
+    /**
+     * Возвращаем целиком list, так как могут быть нескольлко значений/типов файловExclude.
+     *
+     * @return the list
+     */
+    List<String> exclude() {
         return this.exclude;
     }
 
-    public Path output() {
+    /**
+     * Предполагается что в поле {@code data - output} только одно значение поэтому
+     * получаем его  при помощи {@code get(0)}
+     *
+     * @return the path
+     */
+    Path output() {
         return Paths.get(this.output.get(0));
     }
 }

@@ -7,12 +7,12 @@ import java.nio.file.PathMatcher;
 
 /**
  * Класс {@code Matchext} для реализаций сравнения в зависимости от ключа
- *      по маске, полное совпадение имени, регулярное выражение
+ * по маске, полное совпадение имени, регулярное выражение
  */
 class Matchext implements MatchextIn {
     // сравнение по маске
     @Override
-    public boolean matchM(Path file, String pattern) {
+    public boolean matchM(final Path file, String pattern) {
         boolean res = false;
         FileSystem fs = FileSystems.getDefault();
         PathMatcher matcher = fs.getPathMatcher("glob:" + pattern);
