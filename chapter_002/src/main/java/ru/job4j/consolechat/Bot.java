@@ -7,9 +7,6 @@ import java.util.Map;
 
 class Bot extends HumanBot implements HumanBotInt {
     String filephrase = "chapter_002/data/phrase.txt";
-    //String[] words = {"Всё может быть", "Наверное", "Надо подумать", "Это разумно",
-    //        "Как выясню сообщу", "Наверное да, а может быть и нет:)",
-    //        "Давай уже в следующий раз...", "Я бухой !"};
     String[] words;
     Map<String, Answer> map = Map.of(
             "продолжить", this::play,
@@ -26,10 +23,9 @@ class Bot extends HumanBot implements HumanBotInt {
     @Override
     public String action(String mesage) {
         if (map.containsKey(mesage)) {
-            l = (Answer) map.get(mesage);
+            l = map.get(mesage);
         }
-        answer = l.getAnswer();
-        return answer;
+        return l.getAnswer();
     }
 
     private String play() {
@@ -54,6 +50,7 @@ class Bot extends HumanBot implements HumanBotInt {
         try (BufferedReader read = new BufferedReader(new FileReader(path))) {
             words = read.lines().filter(n -> !n.isEmpty()).toArray(String[]::new);
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return words;
     }

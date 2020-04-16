@@ -17,22 +17,21 @@ interface Answer {
 
 public class ConsoleChat {
     String fileLog = "chapter_002/data/logchat.txt";
-    static char[] buffer = new char[16];
-    String mesage = "";
 
     public static void main(String[] args) {
         new ConsoleChat().go();
     }
 
     void go() {
-        HumanBot bot = new Bot("BOT — ");
-        HumanBot human = new Human("Human — ");
-        List<HumanBot> humanBots = List.of(human, bot);
+        String mesage = "";
+        HumanBotInt bot = new Bot("BOT — ");
+        HumanBotInt human = new Human("Human — ");
+        List<HumanBotInt> humanBots = List.of(human, bot);
         System.out.println("Введите предложение:");
         int n = 0;
         while (!mesage.equals("@endchat")) {
-            mesage = ((HumanBotInt) (humanBots.get(n))).action(mesage);
-            log(mesage, humanBots.get(n));
+            mesage = humanBots.get(n).action(mesage);
+            log(mesage, (HumanBot) humanBots.get(n));
             n = ++n % humanBots.size();
         }
     }

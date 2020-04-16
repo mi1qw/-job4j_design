@@ -11,7 +11,7 @@ class Human extends HumanBot implements HumanBotInt {
 
     @Override
     public String action(String mesage) {
-
+        String answer = null;
         try {
             answer = getString();
             out.println(this.str + answer);
