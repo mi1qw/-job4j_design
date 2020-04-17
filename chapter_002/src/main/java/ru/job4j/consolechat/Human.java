@@ -4,17 +4,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-class Human extends HumanBot implements HumanBotInt {
-    public Human(String str) {
-        super(str);
-    }
-
+class Human implements HumanBotInt {
     @Override
-    public String action(String mesage) {
-
+    public String action() {
+        String answer = null;
         try {
             answer = getString();
-            out.println(this.str + answer);
         } catch (IOException e) {
             e.printStackTrace();
         }
