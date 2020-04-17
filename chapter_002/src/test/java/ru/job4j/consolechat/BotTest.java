@@ -2,59 +2,45 @@ package ru.job4j.consolechat;
 
 import org.junit.Test;
 
-import java.util.Arrays;
+import java.io.ByteArrayInputStream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class BotTest {
     @Test
     public void anyMessageFromBot() {
-        Bot bot = new Bot("BOT — ");
-        bot.words = new String[]{"Всё может быть", "Наверное", "Надо подумать", "Это разумно",
-                "Как выясню сообщу", "Наверное да, а может быть и нет:)",
-                "Давай уже в следующий раз...", "Я бухой !"};
-        String mesage = "anything";
-        String actual = bot.action(mesage);
+        final HumanBotInt bot = new Bot(new Human());
 
-        long a = Arrays.stream(bot.words).filter(n -> n == actual).count();
-        assertTrue(a == 1);
-    }
+        /**
+         * Чтобы добиться полного сходства, оставляем только одну фразу.
+         */
+        ((Bot) bot).words = new String[]{"Всё может быть"};
 
-    @Test
-    public void continueMustReturnAnyMessageFromBot() {
-        Bot bot = new Bot("BOT — ");
-        bot.words = new String[]{"Всё может быть", "Наверное", "Надо подумать", "Это разумно",
-                "Как выясню сообщу", "Наверное да, а может быть и нет:)",
-                "Давай уже в следующий раз...", "Я бухой !"};
-        String mesage = "продолжить";
-        String actual = bot.action(mesage);
+        final StringBuilder expected = new StringBuilder()
+                .append("Human - 1").append(System.lineSeparator())
+                .append("Bot - Всё может быть").append(System.lineSeparator())
+                .append("Human - 2").append(System.lineSeparator())
+                .append("Bot - Всё может быть").append(System.lineSeparator())
+                .append("Human - стоп").append(System.lineSeparator())
+                .append("Human - 3").append(System.lineSeparator())
+                .append("Human - 4").append(System.lineSeparator())
+                .append("Human - продолжить").append(System.lineSeparator())
+                .append("Bot - Всё может быть").append(System.lineSeparator())
+                .append("Human - 5").append(System.lineSeparator())
+                .append("Bot - Всё может быть").append(System.lineSeparator())
+                .append("Human - закончить").append(System.lineSeparator());
 
-        long a = Arrays.stream(bot.words).filter(n -> n == actual).count();
-        assertEquals(a, 1);
-    }
+        final String[] list = {"1", "2", "стоп", "3", "4", "продолжить", "5", "закончить"};
+        final StringBuilder actual = new StringBuilder();
 
-    @Test
-    public void stopMustReturnEmptyString() {
-        Bot bot = new Bot("BOT — ");
-        bot.words = new String[]{"Всё может быть", "Наверное", "Надо подумать", "Это разумно",
-                "Как выясню сообщу", "Наверное да, а может быть и нет:)",
-                "Давай уже в следующий раз...", "Я бухой !"};
-        String mesage = "стоп";
-        String actual = bot.action(mesage);
-
-        assertTrue(actual.isEmpty());
-    }
-
-    @Test
-    public void endMustReturnEndchat() {
-        Bot bot = new Bot("BOT — ");
-        bot.words = new String[]{"Всё может быть", "Наверное", "Надо подумать", "Это разумно",
-                "Как выясню сообщу", "Наверное да, а может быть и нет:)",
-                "Давай уже в следующий раз...", "Я бухой !"};
-        String mesage = "закончить";
-        String actual = bot.action(mesage);
-
-        assertTrue(actual.equals("@endchat"));
+        for (int n = 0; n != list.length; ++n) {
+            System.setIn(new ByteArrayInputStream(list[n].getBytes()));
+            actual.append(bot.action()).append(System.lineSeparator());
+        }
+        System.out.println(actual);
+        assertThat(actual.toString(), is(expected.toString()));
     }
 }
+
+

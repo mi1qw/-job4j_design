@@ -5,47 +5,45 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.Map;
 
-class Bot extends HumanBot implements HumanBotInt {
-    String filephrase = "chapter_002/data/phrase.txt";
+class Bot implements HumanBotInt {
+    private String filephrase = "chapter_002/data/phrase.txt";
     String[] words;
-    Map<String, Answer> map = Map.of(
+    private Map<String, Answer> map = Map.of(
             "продолжить", this::play,
             "стоп", this::stop,
             "закончить", this::end
     );
-    Answer l = this::play;
+    private Answer l = this::play;
+    private HumanBotInt answer1;
 
-    public Bot(String str) {
-        super(str);
+    public Bot(final HumanBotInt answer1) {
         this.words = load(new File(filephrase));
+        this.answer1 = answer1;
     }
 
     @Override
-    public String action(String mesage) {
+    public String action() {
+        String mesage = this.answer1.action();
         if (map.containsKey(mesage)) {
             l = map.get(mesage);
         }
-        return l.getAnswer();
+        return "Human - " + mesage + l.getAnswer();
     }
 
     private String play() {
         int q = (int) (Math.random() * words.length);
-        String answer = words[q];
-        out.println(this.str + answer);
-        //System.out.println(this.str + answer);
-        return answer;
+        return System.lineSeparator() + "Bot - " + words[q];
     }
 
     private String stop() {
-        //System.out.println("stop");
         return "";
     }
 
     private String end() {
-        return "@endchat";
+        return "";
     }
 
-    public String[] load(File path) {
+    public String[] load(final File path) {
         String[] words = new String[0];
         try (BufferedReader read = new BufferedReader(new FileReader(path))) {
             words = read.lines().filter(n -> !n.isEmpty()).toArray(String[]::new);
