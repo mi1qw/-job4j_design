@@ -6,32 +6,59 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Map;
 
 public class EchoServer {
-    public static void main(final String[] args) throws IOException {
-        boolean stopServer = false;
-        try (ServerSocket server = new ServerSocket(9000)) {
+    private static final String LN = System.lineSeparator();
+    private final Map<String, String> map = Map.of(
+            "Hello", "Hello, dear friend.",
+            "Exit", "Exit",
+            "What", "What do you want from me?"
+    );
+    private static final String BEGINREG = "^GET /\\?msg=";
+    private static final String ENDNREG = " HTTP.*\\z";
 
-            while (true) {
-                Socket socket = server.accept();
-                try (OutputStream out = socket.getOutputStream();
-                     BufferedReader in = new BufferedReader(
-                             new InputStreamReader(socket.getInputStream()))) {
-                    String str;
-                    while (in.ready()) {
-                        str = in.readLine();
-                        System.out.println(str);
-                        if (str.matches(".*/\\?msg=Bye.*")) {
-                            stopServer = true;
-                        }
-                    }
-                    out.write("HTTP/1.1 200 OK\r\n\\".getBytes());
-                    if (stopServer) {
-                        break;
-                    }
+    public static void main(final String[] args) throws IOException {
+        new EchoServer().server();
+    }
+
+    private void server() throws IOException {
+        String answer = "";
+        try (ServerSocket server = new ServerSocket(9000)) {
+            while (!answer.equals("Exit")) {
+                answer = start(server.accept());
+            }
+        }
+        System.out.println("Server is stoped");
+    }
+
+    String start(final Socket socket) {
+        String answer = "";
+        try (OutputStream out = socket.getOutputStream();
+             BufferedReader in = new BufferedReader(
+                     new InputStreamReader(socket.getInputStream()))) {
+            while (in.ready()) {
+                String str = in.readLine();
+                System.out.println(str);
+                if (str.matches("GET.+HTTP/1.1")) {
+                    answer = getMesage(str);
                 }
             }
-            System.out.println("Server is stoped");
+            out.write(("HTTP/1.1 200 OK" + LN + LN).getBytes());
+            out.write(answer.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return answer;
+    }
+
+    private String getMesage(final String mesage) {
+        String str = mesage.replaceAll(BEGINREG, "");
+        str = str.replaceAll(ENDNREG, "");
+        String answer = map.get(str);
+        if (answer == null) {
+            answer = str;
+        }
+        return answer;
     }
 }
