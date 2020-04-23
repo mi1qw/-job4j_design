@@ -1,8 +1,9 @@
 package ru.job4j.argzip;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.nio.file.Files;
+import java.util.List;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
@@ -13,27 +14,39 @@ import java.util.zip.ZipOutputStream;
  * Только при успешной верификации создаётся архив.
  */
 public final class Zip {
-    public static void main(String[] args) throws Exception {
+    public static void main(final String[] args) throws Exception {
         if (args.length == 0) {
             throw new IllegalStateException("Usage java -jar dir.jar ROOT_FOLDER...");
         }
-        new Zip().go(args);
+        new Zip().argZip(args);
     }
 
-    void go(String[] args) throws Wrongkey, UseKeyDEO {
-        ArgZip a = new ArgZip(args);
-        if (a.valid()) {
-            try (ZipOutputStream zip =
-                         new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(a.output().toFile())))) {
-                PackFiles visitor = new PackFiles(a, zip);
-                visitor.setTypeFile(a.exclude());
+    void argZip(final String[] args) throws Wrongkey, UseKeyDEO, IOException {
+        ArgZip arg = new ArgZip(args);
+        if (arg.valid()) {
+            SearchFiles visitor = new SearchFiles(arg.exclude());
+            Files.walkFileTree(arg.directory(), visitor);
 
-                Files.walkFileTree(a.directory(), visitor);
-            } catch (Exception e) {
-                e.printStackTrace();
+            packFiles(visitor.getFiles(), arg.output().toFile());
+        }
+    }
+
+    /**
+     * Создание архива
+     *
+     * @param sources готовый список файлов для архивации
+     * @param target  имя конечного архива
+     */
+    public void packFiles(final List<File> sources, final File target) {
+        try (ZipOutputStream zip = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(target)))) {
+            for (int n = 0; n != sources.size(); ++n) {
+                zip.putNextEntry(new ZipEntry(sources.get(n).getPath()));
+                try (BufferedInputStream out = new BufferedInputStream(new FileInputStream(sources.get(n)))) {
+                    zip.write(out.readAllBytes());
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
-
-

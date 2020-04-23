@@ -14,8 +14,4 @@ interface MatchextIn {
      * @return the boolean True -  совпадение
      */
     boolean matchM(Path file, String pattern);
-
-    boolean matchF();
-
-    boolean matchR();
 }

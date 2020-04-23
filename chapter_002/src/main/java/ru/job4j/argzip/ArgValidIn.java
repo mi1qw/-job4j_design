@@ -33,14 +33,11 @@ class ValidDirectory implements ArgValidIn {
 class ValidOutput implements ArgValidIn {
     @Override
     public <T> boolean valid(final T t) {
-        boolean res = false;
         String argKey = (String) t;
-        if (argKey.matches("[^\\s]+\\.zip")) {
-            res = true;
-        } else {
+        if (!argKey.matches("[^\\s]+\\.zip")) {
             throw new IllegalStateException("Wrong name for ZIP archive");
         }
-        return res;
+        return true;
     }
 }
 
@@ -52,13 +49,10 @@ class ValidOutput implements ArgValidIn {
 class ValidOFF implements ArgValidIn {
     @Override
     public <T> boolean valid(final T t) {
-        boolean res = false;
         String argKey = (String) t;
-        if (!argKey.isEmpty()) {
-            res = true;
-        } else {
+        if (argKey.isEmpty()) {
             throw new IllegalStateException(System.lineSeparator() + "Wrong argument " + argKey);
         }
-        return res;
+        return true;
     }
 }

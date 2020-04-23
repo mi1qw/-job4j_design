@@ -24,7 +24,7 @@ class ArgZip {
     private final List<String> exclude = new ArrayList<>();
     private final List<String> output = new ArrayList<>();
 
-    ArgZip(String[] args) {
+    ArgZip(final String[] args) {
         this.args = args;
         param.put("-d", new ArgKey("-d", " Specify a path to a directory wich must be ziped",
                 directory, true, new ValidDirectory()));
