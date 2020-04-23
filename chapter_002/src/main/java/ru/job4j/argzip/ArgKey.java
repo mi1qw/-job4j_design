@@ -25,7 +25,7 @@ class ArgKey {
     final ArgValidIn valid;
     int num = 0;
 
-    ArgKey(String key, String text, List<String> data, boolean cons, ArgValidIn valid) {
+    ArgKey(final String key, final String text, final List<String> data, final boolean cons, final ArgValidIn valid) {
         this.key = key;
         this.text = text;
         this.data = data;
