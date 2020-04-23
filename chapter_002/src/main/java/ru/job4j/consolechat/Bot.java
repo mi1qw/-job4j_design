@@ -5,13 +5,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.Map;
 
-class Bot implements HumanBotInt {
+class Bot implements HumanBotInt, Constant {
     private String filephrase = "chapter_002/data/phrase.txt";
     String[] words;
     private Map<String, Answer> map = Map.of(
-            "продолжить", this::play,
-            "стоп", this::stop,
-            "закончить", this::end
+            CONT, this::play,
+            STOP, this::stop,
+            END, this::end
     );
     private Answer l = this::play;
     private HumanBotInt answer1;

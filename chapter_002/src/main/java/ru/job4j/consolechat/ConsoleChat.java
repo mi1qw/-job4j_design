@@ -4,17 +4,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-interface HumanBotInt {
-    String action();
-}
-
-
-interface Answer {
-    String getAnswer();
-}
-
-
-public class ConsoleChat {
+public class ConsoleChat implements Constant {
     private String fileLog = "chapter_002/data/logchat.txt";
 
     public static void main(final String[] args) {
@@ -28,7 +18,7 @@ public class ConsoleChat {
         final HumanBotInt human = new Human();
         final HumanBotInt bot = new Bot(human);
 
-        while (!mesage.endsWith("закончить")) {
+        while (!mesage.endsWith(END)) {
             mesage = bot.action();
             System.out.println(mesage);
             log(mesage);
