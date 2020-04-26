@@ -3,9 +3,8 @@ package ru.job4j.findfile;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -15,87 +14,69 @@ import static org.hamcrest.Matchers.is;
 
 public class ArgFindfileTest {
     @Test
-    public void findFilesMask() throws Wrongkey, UseKeyDEO, UnsupportedEncodingException {
-        String[] args = "-d src/main/java/ru/job4j/findfile -n *.java -m -o log.txt".split("\\s+");
-        ArgFindfile arg = new ArgFindfile(args);
-        ByteArrayOutputStream actualStream = new ByteArrayOutputStream();
+    public void findFilesMask() throws Wrongkey, UseKeyDEO, IOException {
+        final String[] args = "-d src/main/java/ru/job4j/findfile -n *.java -m -o log.txt".split("\\s+");
+        SearchFiles visitor = null;
+        Path[] actual = new Path[0];
+        final ArgFindfile arg = new ArgFindfile(args);
         if (arg.valid()) {
-            try (PrintWriter filelist =
-                         new PrintWriter(actualStream)) {
-                Files visitor = new Files(arg.getMatcher(), filelist);
-                visitor.setTypeFile(arg.getName());
-                java.nio.file.Files.walkFileTree(arg.getDirectory(), visitor);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            visitor = new SearchFiles(arg.getMatcher(), arg.getName());
+            Files.walkFileTree(arg.getDirectory(), visitor);
         }
-
-        Path path = Paths.get("src", "main", "java", "ru", "job4j", "findfile");
-        String[] expected = {
-                path.resolve("ArgFindfile.java").toString(),
-                path.resolve("ArgFuncIn.java").toString(),
-                path.resolve("ArgKey.java").toString(),
-                path.resolve("Files.java").toString(),
-                path.resolve("Findfile.java").toString(),
-                path.resolve("Matchext.java").toString(),
-                path.resolve("Wrongkey.java").toString()
+        final Path path = Paths.get("src", "main", "java", "ru", "job4j", "findfile");
+        Path[] expected = {
+                path.resolve("ArgFindfile.java"),
+                path.resolve("ArgFuncIn.java"),
+                path.resolve("ArgKey.java"),
+                path.resolve("Findfile.java"),
+                path.resolve("Matchext.java"),
+                path.resolve("SearchFiles.java"),
+                path.resolve("Wrongkey.java")
         };
-        String[] actual = actualStream.toString().split(System.lineSeparator());
+        actual = visitor.getFiles().toArray(actual);
         Arrays.sort(actual);
 
         assertThat(actual, is(expected));
     }
 
     @Test
-    public void findFilesFullEqual() throws Wrongkey, UseKeyDEO {
-        String[] args = "-d src/main/java/ru/job4j/findfile -n Findfile.java -f -o log.txt".split("\\s+");
-        ArgFindfile arg = new ArgFindfile(args);
-        ByteArrayOutputStream actual = new ByteArrayOutputStream();
+    public void findFilesFullEqual() throws Wrongkey, UseKeyDEO, IOException {
+        final String[] args = "-d src/main/java/ru/job4j/findfile -n Findfile.java -f -o log.txt".split("\\s+");
+        SearchFiles visitor = null;
+        Path[] actual = new Path[0];
+        final ArgFindfile arg = new ArgFindfile(args);
         if (arg.valid()) {
-            try (PrintWriter filelist =
-                         new PrintWriter(actual)) {
-                Files visitor = new Files(arg.getMatcher(), filelist);
-                visitor.setTypeFile(arg.getName());
-                java.nio.file.Files.walkFileTree(arg.getDirectory(), visitor);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            visitor = new SearchFiles(arg.getMatcher(), arg.getName());
+            Files.walkFileTree(arg.getDirectory(), visitor);
         }
-        String expected = Paths.get("src", "main", "java", "ru", "job4j", "findfile", "Findfile.java").toString()
-                + System.lineSeparator();
+        final Path[] expected = {Paths.get("src", "main", "java", "ru", "job4j", "findfile", "Findfile.java")};
+        actual = visitor.getFiles().toArray(actual);
 
-        assertThat(actual.toString(), is(expected));
+        assertThat(actual, is(expected));
     }
 
     @Test
-    public void findTwoFilesRegularExpression() throws Wrongkey, UseKeyDEO {
-        String[] args = ("-d src/main/java/ru/job4j/findfile -n ^Fil\\w+\\.java ^W\\w+\\.java -r -o "
+    public void findTwoFilesRegularExpression() throws Wrongkey, UseKeyDEO, IOException {
+        final String[] args = ("-d src/main/java/ru/job4j/findfile -n ^Fin\\w+\\.java ^W\\w+\\.java -r -o "
                 + "log.txt").split("\\s+");
-        ArgFindfile arg = new ArgFindfile(args);
-        ByteArrayOutputStream actualStream = new ByteArrayOutputStream();
+        SearchFiles visitor = null;
+        Path[] actual = new Path[0];
+        final ArgFindfile arg = new ArgFindfile(args);
         if (arg.valid()) {
-            try (PrintWriter filelist =
-                         new PrintWriter(actualStream)) {
-                Files visitor = new Files(arg.getMatcher(), filelist);
-                visitor.setTypeFile(arg.getName());
-                java.nio.file.Files.walkFileTree(arg.getDirectory(), visitor);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            visitor = new SearchFiles(arg.getMatcher(), arg.getName());
+            Files.walkFileTree(arg.getDirectory(), visitor);
         }
-        String[] actual = actualStream.toString().split(System.lineSeparator());
-        Arrays.sort(actual);
-        Path path = Paths.get("src", "main", "java", "ru", "job4j", "findfile");
-        String[] expected = {
-                path.resolve("Files.java").toString(),
-                path.resolve("Wrongkey.java").toString()
+        final Path[] expected = {
+                Paths.get("src", "main", "java", "ru", "job4j", "findfile", "Findfile.java"),
+                Paths.get("src", "main", "java", "ru", "job4j", "findfile", "Wrongkey.java")
         };
+        actual = visitor.getFiles().toArray(actual);
 
         assertThat(actual, is(expected));
     }
 
     @Test
-    public void correctKeysAndAfguments() throws Wrongkey, UseKeyDEO {
+    public void correctKeysAndArguments() throws Wrongkey, UseKeyDEO {
         String[] args = "-d src -n *.java -m -o log.txt".split("\\s+");
         Assert.assertTrue(new ArgFindfile(args).valid());
     }

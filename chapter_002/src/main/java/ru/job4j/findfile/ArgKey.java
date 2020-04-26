@@ -25,7 +25,7 @@ class ArgKey {
     final ArgFuncIn func;
     int num = 0;
 
-    ArgKey(String key, String text, List<String> data, boolean cons, ArgFuncIn func) {
+    ArgKey(final String key, final String text, final List<String> data, final boolean cons, final ArgFuncIn func) {
         this.key = key;
         this.text = text;
         this.data = data;
