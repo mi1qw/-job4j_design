@@ -32,7 +32,6 @@ class Matchext {
     public <T> boolean matchF(final T t) {
         String[] s = (String[]) t;
         pattern = s[0];
-        //String file = ;
         String file = Paths.get(s[1]).getFileName().toString();
 
         boolean res = false;

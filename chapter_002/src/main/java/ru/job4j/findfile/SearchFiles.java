@@ -1,7 +1,6 @@
 package ru.job4j.findfile;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Path;
@@ -15,37 +14,29 @@ import static java.nio.file.FileVisitResult.CONTINUE;
  * реализация методов FileVisitor
  * для обхода дерева каталогов
  */
-class Files implements FileVisitor<Path> {
-    private final List<String> list = new ArrayList<>();
+class SearchFiles implements FileVisitor<Path> {
+    private final List<Path> list = new ArrayList<>();
     private List<String> typeFile;
-    private final PrintWriter out;
     private ArgFuncIn matcher;
 
     /**
      * конструктор {@code Files}.
      *
-     * @param matcher ссылка реализаций сравнения в зависимости от ключа
-     *                по маске, полное совпадение имени, регулярное выражение
-     * @param out     поток вывода PrintWriter
+     * @param matcher  ссылка реализаций сравнения в зависимости от ключа
+     *                 по маске, полное совпадение имени, регулярное выражение
+     * @param typeFile список имён/паттернов для поиска
      * @see ArgFuncIn фугкциональный интерфейс ArgFuncIn <T> boolean valid(T t)
      */
-    Files(final ArgFuncIn matcher, final PrintWriter out) {
+    SearchFiles(final ArgFuncIn matcher, final List<String> typeFile) {
         this.matcher = matcher;
-        this.out = out;
+        this.typeFile = typeFile;
     }
 
     /**
      * @return the files
      */
-    private List<String> getFiles() {
+    List<Path> getFiles() {
         return list;
-    }
-
-    /**
-     * @param typeFile список имён/паттернов для поиска
-     */
-    public void setTypeFile(final List<String> typeFile) {
-        this.typeFile = typeFile;
     }
 
     @Override
@@ -73,7 +64,7 @@ class Files implements FileVisitor<Path> {
         for (String pattern : typeFile) {
             String[] s = {pattern, name.toString()};
             if (matcher.valid(s)) {
-                out.println(file.toString());
+                list.add(file);
             }
         }
         return CONTINUE;

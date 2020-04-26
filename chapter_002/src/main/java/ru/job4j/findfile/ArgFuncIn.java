@@ -18,7 +18,7 @@ interface ArgFuncIn {
 class ValidDirectory implements ArgFuncIn {
     @Override
     public <T> boolean valid(final T t) {
-        Path path = Paths.get((String) t);
+        final Path path = Paths.get((String) t);
         if (path.toFile().isFile()) {
             throw new IllegalStateException("1st argument must be a folder. Usage java -jar dir.jar ROOT_FOLDER.");
         } else if (!path.toFile().exists()) {
@@ -36,14 +36,11 @@ class ValidDirectory implements ArgFuncIn {
 class ValidOutput implements ArgFuncIn {
     @Override
     public <T> boolean valid(final T t) {
-        boolean res = false;
-        String argKey = (String) t;
-        if (argKey.matches("[^\\s]+\\.txt")) {
-            res = true;
-        } else {
+        final String argKey = (String) t;
+        if (!argKey.matches("[^\\s]+\\.txt")) {
             throw new IllegalStateException("Wrong name for *.txt file");
         }
-        return res;
+        return true;
     }
 }
 
@@ -55,13 +52,10 @@ class ValidOutput implements ArgFuncIn {
 class ValidOFF implements ArgFuncIn {
     @Override
     public <T> boolean valid(final T t) {
-        boolean res = false;
-        String argKey = (String) t;
-        if (!argKey.isEmpty()) {
-            res = true;
-        } else {
+        final String argKey = (String) t;
+        if (argKey.isEmpty()) {
             throw new IllegalStateException(System.lineSeparator() + "Wrong argument " + argKey);
         }
-        return res;
+        return true;
     }
 }
