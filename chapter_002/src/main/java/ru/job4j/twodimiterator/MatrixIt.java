@@ -3,13 +3,13 @@ package ru.job4j.twodimiterator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class TwoDimIterator implements Iterator {
-    private int indexRow = -1;
+public class MatrixIt implements Iterator {
+    private int indexRow = 0;
     private int indexCol = -1;
     private int size;
     private int[][] array;
 
-    public TwoDimIterator(final int[][] array) {
+    public MatrixIt(final int[][] array) {
         this.array = array;
         this.size = array.length;
     }
@@ -24,9 +24,15 @@ public class TwoDimIterator implements Iterator {
     @Override
     public boolean hasNext() {
         boolean res = false;
-        if ((indexCol + 1) < (array[indexRow + 1].length) && indexRow < size - 1) {
+
+        if (indexCol + 1 < array[indexRow].length) {
             res = true;
-        } else if (indexRow + 1 < size - 1) {
+        } else if (indexRow + 1 < size) {
+            indexCol = -1;
+            while (array[indexRow + 1].length == 0) {
+                ++indexRow;
+            }
+            ++indexRow;
             res = true;
         }
         return res;
@@ -40,13 +46,13 @@ public class TwoDimIterator implements Iterator {
      */
     @Override
     public Integer next() {
-        if (++indexCol == array[indexRow + 1].length) {
+        if (!hasNext()) {
+            throw new NoSuchElementException("End of array");
+        } else if (++indexCol == array[indexRow].length) {
             indexCol = 0;
-            if (++indexRow == size - 1) {
-                throw new NoSuchElementException("End of array");
-            }
+            ++indexRow;
         }
-        return array[indexRow + 1][indexCol];
+        return array[indexRow][indexCol];
     }
 
     /**
@@ -63,8 +69,8 @@ public class TwoDimIterator implements Iterator {
      *
      * @return the two dim iterator
      */
-    public TwoDimIterator reset() {
-        indexRow = -1;
+    public MatrixIt reset() {
+        indexRow = 0;
         indexCol = -1;
         return this;
     }
@@ -72,7 +78,7 @@ public class TwoDimIterator implements Iterator {
     public static void main(final String[] args) {
 
         int[][] array = {{1}, {2, 3, 4, 5}, {6, 7}, {8, 9, 10, 11, 12, 13, 14}};
-        TwoDimIterator it = new TwoDimIterator(array);
+        MatrixIt it = new MatrixIt(array);
         while (it.hasNext()) {
             System.out.println(it.next());
         }
