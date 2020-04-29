@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/mi1qw/-job4j_design.svg?branch=master)](https://travis-ci.org/mi1qw/-job4j_design)
-
+[![Hits-of-Code](https://hitsofcode.com/mi1qw/-job4j_design.svg?branch=master)](https://hitsofcode.com/view/mi1qw/-job4j_design.svg?branch=master)
 # Репозиторий обучения языку Java на [Job4j.ru](http://Job4j.ru)
 
 ### Оглавление проекта
