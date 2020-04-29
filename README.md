@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e8c8b0f881954eb4a9e8837be113a375)](https://app.codacy.com/manual/mi1qw/-job4j_design?utm_source=github.com&utm_medium=referral&utm_content=mi1qw/-job4j_design&utm_campaign=Badge_Grade_Dashboard)
 [![We recommend IntelliJ IDEA](https://www.elegantobjects.org/intellij-idea.svg)](https://www.jetbrains.com/idea/)
 
 [![Build Status](https://travis-ci.org/mi1qw/-job4j_design.svg?branch=master)](https://travis-ci.org/mi1qw/-job4j_design)
