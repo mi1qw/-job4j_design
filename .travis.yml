@@ -10,12 +10,17 @@ sudo: false
 ## Здесь используется сторонни сервис https://codecov.io/
 after_success:
   - bash <(curl -s https://codecov.io/bash)
-    
+  - mvn clean test jacoco:report coveralls:report
 
 # Отправлять уведомление на почтуyouremail@smtp.ru(Изменить на свою) если сборка упала
 notifications:
+  webhooks: https://coveralls.io/webhook
   email:
     recipients:
       -123mib@gmail.com
-    on_success: never # default: change
+    on_success: always # default: change
     on_failure: always # default: always
+
+env:
+  global:
+    - CODECOV_TOKEN="14d8bdaf-bfe0-4505-a092-2f9c6af61290"
