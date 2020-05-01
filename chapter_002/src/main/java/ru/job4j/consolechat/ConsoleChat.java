@@ -1,17 +1,15 @@
 package ru.job4j.consolechat;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 
 public class ConsoleChat implements Constant {
     private String fileLog = "chapter_002/data/logchat.txt";
 
-    public static void main(final String[] args) {
+    public static void main(final String[] args) throws FileNotFoundException, UnsupportedEncodingException {
         new ConsoleChat().go();
     }
 
-    void go() {
+    final void go() throws FileNotFoundException, UnsupportedEncodingException {
         String mesage = "";
         System.out.println("Введите предложение:");
 
@@ -25,14 +23,14 @@ public class ConsoleChat implements Constant {
         }
     }
 
-    void log(final String mesage) {
+    final void log(final String mesage) {
         if (!mesage.isEmpty()) {
             String log = mesage + System.lineSeparator();
             savefile(fileLog, log);
         }
     }
 
-    void savefile(final String path, final String text) {
+    final void savefile(final String path, final String text) {
         try (BufferedWriter bufferWriter = new BufferedWriter(new FileWriter(path, true))) {
             bufferWriter.write(text);
         } catch (IOException e) {
