@@ -4,14 +4,27 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class MatrixIt implements Iterator {
-    private int indexRow = 0;
-    private int indexCol = -1;
+    private int row = 0;
+    private int col = 0;
     private int size;
     private int[][] array;
 
     public MatrixIt(final int[][] array) {
         this.array = array;
         this.size = array.length;
+    }
+
+    public static void main(final String[] args) {
+
+        int[][] array = {{1}, {2, 3, 4, 5}, {6, 7}, {8, 9, 10, 11, 12, 13, 14}};
+        MatrixIt it = new MatrixIt(array);
+        while (it.hasNext()) {
+            System.out.println(it.next());
+        }
+
+        System.out.println();
+
+        it.reset().display();
     }
 
     /**
@@ -23,19 +36,10 @@ public class MatrixIt implements Iterator {
      */
     @Override
     public boolean hasNext() {
-        boolean res = false;
-
-        if (indexCol + 1 < array[indexRow].length) {
-            res = true;
-        } else if (indexRow + 1 < size) {
-            indexCol = -1;
-            while (array[indexRow + 1].length == 0) {
-                ++indexRow;
-            }
-            ++indexRow;
-            res = true;
+        while (row < size && array[row].length == 0) {
+            ++row;
         }
-        return res;
+        return row < size && col < array[row].length;
     }
 
     /**
@@ -48,11 +52,13 @@ public class MatrixIt implements Iterator {
     public Integer next() {
         if (!hasNext()) {
             throw new NoSuchElementException("End of array");
-        } else if (++indexCol == array[indexRow].length) {
-            indexCol = 0;
-            ++indexRow;
         }
-        return array[indexRow][indexCol];
+        Integer i = array[row][col];
+        if (++col == array[row].length) {
+            col = 0;
+            ++row;
+        }
+        return i;
     }
 
     /**
@@ -70,21 +76,8 @@ public class MatrixIt implements Iterator {
      * @return the two dim iterator
      */
     public MatrixIt reset() {
-        indexRow = 0;
-        indexCol = -1;
+        row = 0;
+        col = 0;
         return this;
-    }
-
-    public static void main(final String[] args) {
-
-        int[][] array = {{1}, {2, 3, 4, 5}, {6, 7}, {8, 9, 10, 11, 12, 13, 14}};
-        MatrixIt it = new MatrixIt(array);
-        while (it.hasNext()) {
-            System.out.println(it.next());
-        }
-
-        System.out.println();
-
-        it.reset().display();
     }
 }
