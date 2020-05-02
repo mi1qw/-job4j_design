@@ -17,7 +17,7 @@ class Human implements HumanBotInt {
     }
 
     String getString() throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
         return br.readLine();
     }
 }

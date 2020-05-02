@@ -2,11 +2,13 @@ package ru.job4j.consolechat;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.nio.file.Path;
 import java.util.Map;
 
 class Bot implements HumanBotInt, Constant {
-    private String filephrase = "chapter_002/data/phrase.txt";
+    private File filephrase = Path.of("data", "phrase.txt").toFile();
     String[] words;
     private Map<String, Answer> map = Map.of(
             CONT, this::play,
@@ -16,8 +18,8 @@ class Bot implements HumanBotInt, Constant {
     private Answer l = this::play;
     private HumanBotInt answer1;
 
-    public Bot(final HumanBotInt answer1) {
-        this.words = load(new File(filephrase));
+    public Bot(final HumanBotInt answer1) throws FileNotFoundException {
+        this.words = load(new File(String.valueOf(filephrase)));
         this.answer1 = answer1;
     }
 
@@ -43,8 +45,9 @@ class Bot implements HumanBotInt, Constant {
         return "";
     }
 
-    public String[] load(final File path) {
-        String[] words = new String[0];
+    public String[] load(final File path) throws FileNotFoundException {
+        System.out.println(path);
+        String[] words = new String[10];
         try (BufferedReader read = new BufferedReader(new FileReader(path))) {
             words = read.lines().filter(n -> !n.isEmpty()).toArray(String[]::new);
         } catch (Exception e) {
