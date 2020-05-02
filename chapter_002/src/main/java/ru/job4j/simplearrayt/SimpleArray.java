@@ -1,18 +1,29 @@
 package ru.job4j.simplearrayt;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 public class SimpleArray<T> implements Iterable<T> {
     private T[] array;
     private int size;
-    private int index;
+    private int length;
 
-    public SimpleArray(final T[] array) {
-        this.array = array;
-        this.size = array.length;
-        this.index = this.size - 1;
+    /**
+     * Конструктор.
+     * Создаём Object и приводим его к T[] array
+     *
+     * @param size the size
+     */
+    @SuppressWarnings("unchecked")
+    public SimpleArray(final int size) {
+        this.size = size;
+        this.length = -1;
+        this.array = (T[]) new Object[size];
     }
 
+    /**
+     * @return Generic Iterator
+     */
     final @Override
     public Iterator<T> iterator() {
         return new Iterator<T>() {
@@ -20,6 +31,9 @@ public class SimpleArray<T> implements Iterable<T> {
 
             @Override
             public boolean hasNext() {
+                while (it < size && array[it] == null) {
+                    ++it;
+                }
                 return it < size;
             }
 
@@ -30,32 +44,41 @@ public class SimpleArray<T> implements Iterable<T> {
         };
     }
 
-    final void add(final T model) {
-        if (this.index + 1 == this.size) {
-            Object[] t = new Object[this.size * 2];
-            int n;
-            for (n = 0; n < this.size; ++n) {
-                t[n] = this.array[n];
+    final int length() {
+        return this.length + 1;
+    }
+
+    final int add(final T model) throws ArrayIndexOutOfBoundsException {
+        for (int n = 0; n < this.size; ++n) {
+            if (array[n] == null) {
+                array[n] = model;
+                ++this.length;
+                return n;
             }
-            this.array = (T[]) t;
-            this.index = --n;
-            this.size = this.array.length;
         }
-        array[++this.index] = model;
+        throw new ArrayIndexOutOfBoundsException();
+        //array[++this.index] = model;
     }
 
     final void set(final int index, final T model) {
-        //index = Objects.checkIndex(0, this.size);
+        Objects.checkIndex(index, this.size);
         array[index] = model;
-    }
-
-    final void remove(final int index) {
-        for (int n = index; n < this.size - 1; ++n) {
-            array[n] = array[n + 1];
+        if (model == null) {
+            --this.length;
         }
     }
 
+    final void remove(final int index) throws ArrayIndexOutOfBoundsException {
+        Objects.checkIndex(index, this.size);
+        for (int n = index; n < this.size - 1; ++n) {
+            array[n] = array[n + 1];
+        }
+        array[size - 1] = null;
+        this.length--;
+    }
+
     final T get(final int index) {
+        Objects.checkIndex(index, this.size);
         return array[index];
     }
 

@@ -8,8 +8,7 @@ public class WrappArray {
     }
 
     final void go() {
-        Integer[] num = {1, 2};
-        SimpleArray<Integer> a = new SimpleArray<>(num);
+        SimpleArray<Integer> a = new SimpleArray<>(4);
         a.display();
         a.add(3);
         a.display();
@@ -18,7 +17,7 @@ public class WrappArray {
         a.add(5);
         a.display();
 
-        a.set(1, 555);
+        a.set(3, 555);
         a.display();
 
         System.out.println(a.get(1));
