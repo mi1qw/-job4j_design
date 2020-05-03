@@ -10,6 +10,7 @@ import static org.hamcrest.Matchers.is;
 
 public class SimpleArrayTest {
     private SimpleArray<Integer> array;
+    private SimpleArray<Integer> initarray;
     private Iterator<Integer> it;
 
     @Before
@@ -20,6 +21,9 @@ public class SimpleArrayTest {
         array.add(2);
         array.add(3);
         it = array.iterator();
+
+        Integer[] i = {null, null, 1, 2, null, 4, null, 6, 7};
+        initarray = new SimpleArray<>(i);
     }
 
     @Test
@@ -53,81 +57,54 @@ public class SimpleArrayTest {
     public void set() {
         array.set(0, 5);
         assertThat(array.get(0), is(5));
+        initarray.set(2, 11);
+        assertThat(initarray.get(2), is(11));
     }
 
     @Test
     public void remove() {
-        System.out.println(array.length());
         array.remove(2);
-        System.out.println(array.length());
         assertThat(array.get(2), is(3));
+
+        initarray.dispSizeArray();
+        initarray.dispIterator();
+        System.out.print("remove - " + initarray.get(2));
+        System.out.println("   length array " + initarray.length);
+        initarray.remove(2);
+        initarray.dispSizeArray();
+        initarray.dispIterator();
+        System.out.println("length array " + initarray.length);
+        System.out.println();
+        assertThat(initarray.get(2), is(2));
     }
 
-    @Test
-    public void remove1() {
-        System.out.println(array.length());
-        array.remove(2);
-        System.out.println(array.length());
-        assertThat(array.get(2), is(3));
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void removeOutOfBounds() {
+        array.remove(20);
     }
 
     @Test
     public void add() {
-        System.out.println("size " + array.length());
-        array.display();
-        dispIterator(array);
         System.out.println();
+        System.out.println("length array " + initarray.length);
+        initarray.dispSizeArray();
+        initarray.dispIterator();
 
-        array.remove(1);
-        array.display();
-        System.out.println("size " + array.length());
-        dispIterator(array);
-        System.out.println();
-
-        array.set(1, null);
-        array.display();
-        dispIterator(array);
-        System.out.println("size " + array.length());
-        System.out.println();
-
-        array.add(555);
-        array.display();
-        dispIterator(array);
-        System.out.println("size " + array.length());
-        System.out.println();
-
-        array.add(111);
-        array.display();
-        dispIterator(array);
-        System.out.println("size " + array.length());
-        System.out.println();
-
-        array.add(222);
-        array.display();
-        dispIterator(array);
-        System.out.println("size " + array.length());
-        System.out.println();
-
-        //array.add(222);
-        //array.display();
-        //System.out.println("size " + array.length());
-
-        dispIterator(array);
+        System.out.println("Add 555");
+        initarray.add(555);
+        System.out.println("length array " + initarray.length);
+        initarray.dispSizeArray();
+        initarray.dispIterator();
+        assertThat(initarray.get(0), is(555));
+        initarray.add(555);
+        assertThat(initarray.get(1), is(555));
+        initarray.add(555);
+        assertThat(initarray.get(4), is(555));
     }
 
     @Test
-    public void display() {
-    }
-
-    @Test
-    public void length() {
-    }
-
-    final void dispIterator(final SimpleArray<Integer> array) {
-        Iterator<Integer> it = array.iterator();
-        while (it.hasNext()) {
-            System.out.print(it.next() + " ");
-        }
-        System.out.println();
+    public void getLength() {
+        assertThat(initarray.length, is(5));
+        assertThat(array.length, is(4));
     }
 }
