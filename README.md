@@ -5,6 +5,11 @@
 [![We recommend IntelliJ IDEA](https://www.elegantobjects.org/intellij-idea.svg)](https://www.jetbrains.com/idea/)
 [![Hits-of-Code](https://hitsofcode.com/github/mi1qw/-job4j_design)](https://hitsofcode.com/view/github/mi1qw/-job4j_design)
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ru.job4j%3Atracker&metric=alert_status)](https://sonarcloud.io/dashboard?id=ru.job4j%3Atracker)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ru.job4j%3Atracker&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=ru.job4j%3Atracker)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=ru.job4j%3Atracker&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=ru.job4j%3Atracker)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ru.job4j%3Atracker&metric=coverage)](https://sonarcloud.io/dashboard?id=ru.job4j%3Atracker)
+
 
 # Репозиторий обучения Java на [Job4j.ru](http://Job4j.ru)
 

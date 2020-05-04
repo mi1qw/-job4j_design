@@ -20,8 +20,12 @@
         <maven.compiler.source>13</maven.compiler.source>
         <maven.compiler.target>13</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
+        <!--        <sonar.projectKey>mi1qw_-job4j_design</sonar.projectKey>-->
+        <sonar.organization>mi1qw</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.login>ae9b50539b66ced39f002b9801f11848af91dd3e</sonar.login>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.hamcrest</groupId>
@@ -59,8 +63,12 @@
             <version>1.7.4</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.sonarsource.scanner.maven</groupId>
+            <artifactId>sonar-maven-plugin</artifactId>
+            <version>3.7.0.1746</version>
+        </dependency>
     </dependencies>
-
 
     <build>
         <plugins>
@@ -89,6 +97,18 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.4</version>
+                <configuration>
+                    <excludes>
+                        <exclude>ru/job4j/tictactoe/</exclude>
+                        <exclude>ru/job4j/lspfood/</exclude>
+                        <exclude>ru/job4j/ispmenu/</exclude>
+                        <exclude>ru/job4j/kiss/</exclude>
+                        <exclude>ru/job4j/lspparking/</exclude>
+                        <exclude>ru/job4j/simplegenerator/</exclude>
+                        <exclude>ru/job4j/srp/</exclude>
+                        <exclude>ru/job4j/lspfood/</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -115,17 +135,6 @@
                         <version>2.3.1</version>
                     </dependency>
                 </dependencies>
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <phase>site</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>report</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <repoToken>IZZHhNwMyBbmMwfmrMFfZSoTRo03bT7hL</repoToken>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
             </plugin>
         </plugins>
     </build>
@@ -139,5 +148,4 @@
             </plugin>
         </plugins>
     </reporting>
-
 </project>

@@ -1,23 +1,20 @@
-# РёСЃРїРѕР»СЊР·СѓРµРј СЏР·С‹Рє java. Travis CI РїРѕРґРґРµСЂР¶РёРІР°РµС‚ РґСЂСѓРіРёРµ СЏР·С‹РєРё С‚РѕР¶Рµ.
+# используем язык java. Travis CI поддерживает другие языки тоже.
 language: java
 jdk:
   - openjdk13
-
-# РёСЃРїРѕР»СЊР·СѓРµРј СЂРµР¶РёРј РѕР±С‹С‡РЅРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РґР»СЏ СЃР±РѕСЂРєРё РїСЂРѕРµРєС‚Р°.
 sudo: false
 
-## РїРѕСЃР»Рµ РІС‹РїРѕР»РЅРµРЅРёСЏ СЃР±РѕСЂРєРё Р·Р°РїСѓСЃС‚РёС‚СЊ СЃРєСЂРёРїС‚, РєРѕС‚РѕСЂС‹Р№ Р±СѓРґРµС‚ СЃРѕР±РёСЂР°С‚СЊ СЃС‚Р°С‚РёСЃС‚РёРєСѓ РїРѕ JaCoCo
-## Р—РґРµСЃСЊ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ СЃС‚РѕСЂРѕРЅРЅРё СЃРµСЂРІРёСЃ https://codecov.io/
+## после выполнения сборки запустить скрипт, который будет собирать статистику по JaCoCo
+## Здесь используется сторонни сервис https://codecov.io/
 after_success:
   - bash <(curl -s https://codecov.io/bash)
   - mvn clean test jacoco:report coveralls:report
 
-# РћС‚РїСЂР°РІР»СЏС‚СЊ СѓРІРµРґРѕРјР»РµРЅРёРµ РЅР° РїРѕС‡С‚Сѓyouremail@smtp.ru(РР·РјРµРЅРёС‚СЊ РЅР° СЃРІРѕСЋ) РµСЃР»Рё СЃР±РѕСЂРєР° СѓРїР°Р»Р°
+# Отправлять уведомление на почтуyouremail@smtp.ru(Изменить на свою) если сборка упала
 notifications:
   webhooks: https://coveralls.io/webhook
   email:
-    recipients:
-      -123mib@gmail.com
+    recipients: "-123mib@gmail.com"
     on_success: always # default: change
     on_failure: always # default: always
 
