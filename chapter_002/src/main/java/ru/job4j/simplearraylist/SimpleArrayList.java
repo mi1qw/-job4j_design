@@ -1,65 +1,120 @@
 package ru.job4j.simplearraylist;
 
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
+import java.util.*;
 
 public class SimpleArrayList<T> implements Iterable<T> {
-    protected int modCount = 0;
-    private final T[] array;
-    private int length;
+    private int modCount = 0;
+    private Object[] array;
+    private int size;
+    private static final int DEFAULT_CAPACITY = 10;
 
     /**
      * Конструктор.
-     * Создаём Object и приводим его к T[] array
+     * Создаём Object,размерность по умолчанию или size
      *
-     * @param size фиксированно, нединамическая коллекция
+     * @param initCapacity фиксированно, нединамическая коллекция
      */
-    @SuppressWarnings("unchecked")
-    public SimpleArrayList(final int size) {
-        this.size = size;
-        this.length = 0;
-        this.array = (T[]) new Object[size];
-
-        int index = 1;
-        int i;
-        if ((i = index) >= 0 && (index = hi) <= a.length) {
-            for (; i < hi; ++i) {
-                @SuppressWarnings("unchecked") E e = (E) a[i];
-                action.accept(e);
-            }
-            if (lst.modCount == mc)
-                return;
+    public SimpleArrayList(final int initCapacity) {
+        if (initCapacity > 0) {
+            this.array = new Object[initCapacity];
+        } else {
+            this.array = new Object[DEFAULT_CAPACITY];
         }
     }
 
     /**
-     * Конструктор.
-     * Инициализация готовым массивом T[] array
-     *
-     * @param array the array
+     * Constructs an empty list with an initial capacity of ten.
      */
-    public SimpleArrayList(final T[] array) {
-        this.array = array;
-        this.size = array.length;
-        this.length = getLength(array);
+    public SimpleArrayList() {
+        this.array = new Object[DEFAULT_CAPACITY];
     }
 
-    private void checkForComodification(final int expectedModCount) {
+    /**
+     * Конструктор.
+     * Инициализация какой-то коллекцией  Collection<? extends T> array
+     *
+     * @param origArray the orig array
+     */
+    public SimpleArrayList(final Collection<? extends T> origArray) {
+        this.array = origArray.toArray();
+        this.size = this.array.length;
+        if (size == 0) {
+            this.array = new Object[DEFAULT_CAPACITY];
+        }
+    }
+
+    /**
+     * Get t.
+     *
+     * @param index the index
+     * @return the t
+     */
+    public T get(final int index) {
+        Objects.checkIndex(index, size);
+        return (T) this.array[index];
+    }
+
+    /**
+     * Add.
+     * При заполнении массива, созодаём новый в два раза больший
+     *
+     * @param model the model
+     */
+    public void add(final T model) {
+        ++modCount;
+        if (this.size == array.length) {
+            this.array = Arrays.copyOf(array, array.length * 2);
+        }
+        array[size++] = model;
+    }
+
+    /**
+     * Returns the number of elements in this list.
+     *
+     * @return the number of elements in this list
+     */
+    public int size() {
+        return size;
+    }
+
+    private void checkForModification(final int expectedModCount) {
         if (modCount != expectedModCount) {
             throw new ConcurrentModificationException();
         }
     }
 
-    public final T get(final int index) {
-        return null;
-    }
-
-    public void add(final T model) {
-
-    }
-
     @Override
     public final Iterator<T> iterator() {
-        return null;
+        return new Iterator<T>() {
+            private int expectedModCount = modCount;
+            private int it = 0;
+
+            /**
+             * Returns {@code true} if the iteration has more elements.
+             * (In other words, returns {@code true} if {@link #next} would
+             * return an element rather than throwing an exception.)
+             *
+             * @return {@code true} if the iteration has more elements
+             */
+            @Override
+            public boolean hasNext() {
+                return it < size;
+            }
+
+            /**
+             * Returns the next element in the iteration.
+             *
+             * @return the next element in the iteration
+             * @throws NoSuchElementException if the iteration has no more elements
+             */
+            @Override
+            public T next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                checkForModification(expectedModCount);
+                return (T) array[it++];
+            }
+        };
     }
 }

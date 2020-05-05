@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -52,5 +53,44 @@ public class SimpleArrayListTest {
         Iterator<String> it = array.iterator();
         array.add("second");
         it.next();
+    }
+
+    @Test
+    public void whenCreateFromSmallArray() {
+        SimpleArrayList<String> str = new SimpleArrayList<>(1);
+        str.add("one");
+        str.add("two");
+        assertThat(str.get(0), is("one"));
+        assertThat(str.get(1), is("two"));
+        assertThat(str.size(), is(2));
+    }
+
+    @Test
+    public void whenCreateEmptyArray() {
+        SimpleArrayList<String> str = new SimpleArrayList<>();
+        str.add("one");
+        assertThat(str.get(0), is("one"));
+        assertThat(str.size(), is(1));
+    }
+
+    @Test
+    public void whenCreateFromCollection() {
+        List<String> strings = List.of("one", "two");
+        SimpleArrayList<String> str = new SimpleArrayList<>(strings);
+        assertThat(str.get(0), is("one"));
+        assertThat(str.get(1), is("two"));
+    }
+
+    @Test
+    public void whenCreateEmptyCollection() {
+        List<String> strings = List.of();
+        SimpleArrayList<String> str = new SimpleArrayList<>(strings);
+        assertThat(str.size(), is(0));
+    }
+
+    @Test
+    public void whenCreateZeroCapacitiy() {
+        SimpleArrayList<String> str = new SimpleArrayList<>(0);
+        assertThat(str.size(), is(0));
     }
 }
