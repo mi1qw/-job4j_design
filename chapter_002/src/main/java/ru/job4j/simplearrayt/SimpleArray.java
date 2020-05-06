@@ -1,13 +1,13 @@
 package ru.job4j.simplearrayt;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public class SimpleArray<T> implements Iterable<T> {
     private final T[] array;
     private final int size;
-    @SuppressWarnings("CheckStyle")
-    public int length;
+    private int length;
 
     /**
      * Конструктор.
@@ -31,7 +31,7 @@ public class SimpleArray<T> implements Iterable<T> {
     public SimpleArray(final T[] array) {
         this.array = array;
         this.size = array.length;
-        this.length = getLength(array);
+        this.length = getLengthArray(array);
     }
 
     /**
@@ -40,20 +40,27 @@ public class SimpleArray<T> implements Iterable<T> {
      * @param array the array
      * @return the length
      */
-    private int getLength(final T[] array) {
-        int length = 0;
+    private int getLengthArray(final T[] array) {
+        int lengthArray = 0;
         for (T n : array) {
             if (n != null) {
-                ++length;
+                ++lengthArray;
             }
         }
-        return length;
+        return lengthArray;
+    }
+
+    /**
+     * @return the length
+     */
+    public int length() {
+        return this.length;
     }
 
     /**
      * @return Generic Iterator.
      */
-    final @Override
+    @Override
     public Iterator<T> iterator() {
         return new Iterator<T>() {
             private int it = 0;
@@ -68,6 +75,9 @@ public class SimpleArray<T> implements Iterable<T> {
 
             @Override
             public T next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
                 return array[it++];
             }
         };
@@ -78,9 +88,8 @@ public class SimpleArray<T> implements Iterable<T> {
      *
      * @param model the model
      * @return the int позиция куда был вставлен элемент
-     * @throws ArrayIndexOutOfBoundsException the array index out of bounds exception
      */
-    public int add(final T model) throws ArrayIndexOutOfBoundsException {
+    public int add(final T model) {
         int m = -1;
         for (int n = 0; n < this.size; ++n) {
             if (array[n] == null) {
@@ -115,15 +124,11 @@ public class SimpleArray<T> implements Iterable<T> {
      * единицу влево.
      *
      * @param index the index
-     * @throws ArrayIndexOutOfBoundsException the array index out of bounds exception
      */
-    public void remove(final int index) throws ArrayIndexOutOfBoundsException {
+    public void remove(final int index) {
         Objects.checkIndex(index, this.size);
-        for (int n = index; n < this.size - 1; ++n) {
-            array[n] = array[n + 1];
-        }
-        array[size - 1] = null;
-        this.length--;
+        System.arraycopy(array, index + 1, array, index, array.length - index - 1);
+        set(array.length - 1, null);
     }
 
     /**
@@ -138,13 +143,19 @@ public class SimpleArray<T> implements Iterable<T> {
     }
 
     /**
-     * Вывести в консоль полностью массив со всеми пустыми ячейками.
+     * @return возвращаем все элементы массива, вместе с Null
      */
-    public void dispSizeArray() {
-        for (int n = 0; n < this.size; ++n) {
-            System.out.print(this.array[n] + " ");
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (T t : array) {
+            if (t == null) {
+                sb.append("null").append(" ");
+            } else {
+                sb.append(t.toString()).append(" ");
+            }
         }
-        System.out.println();
+        return sb.toString();
     }
 
     /**

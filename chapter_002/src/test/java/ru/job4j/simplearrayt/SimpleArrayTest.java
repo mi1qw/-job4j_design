@@ -4,9 +4,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 
 public class SimpleArrayTest {
     private SimpleArray<Integer> array;
@@ -41,7 +43,7 @@ public class SimpleArrayTest {
         assertThat(it.next(), is(2));
     }
 
-    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    @Test(expected = NoSuchElementException.class)
     public void whenNextFromEmpty() {
         Iterator<Integer> it = new SimpleArray<Integer>(0).iterator();
         it.next();
@@ -66,14 +68,14 @@ public class SimpleArrayTest {
         array.remove(2);
         assertThat(array.get(2), is(3));
 
-        initarray.dispSizeArray();
+        System.out.println(initarray);
         initarray.dispIterator();
         System.out.print("remove - " + initarray.get(2));
-        System.out.println("   length array " + initarray.length);
+        System.out.println("   length array " + initarray.length());
         initarray.remove(2);
-        initarray.dispSizeArray();
+        System.out.println(initarray);
         initarray.dispIterator();
-        System.out.println("length array " + initarray.length);
+        System.out.println("length array " + initarray.length());
         System.out.println();
         assertThat(initarray.get(2), is(2));
     }
@@ -85,15 +87,14 @@ public class SimpleArrayTest {
 
     @Test
     public void add() {
-        System.out.println();
-        System.out.println("length array " + initarray.length);
-        initarray.dispSizeArray();
+        System.out.println("length array " + initarray.length());
+        System.out.println(initarray);
         initarray.dispIterator();
 
         System.out.println("Add 555");
         initarray.add(555);
-        System.out.println("length array " + initarray.length);
-        initarray.dispSizeArray();
+        System.out.println("length array " + initarray.length());
+        System.out.println(initarray);
         initarray.dispIterator();
         assertThat(initarray.get(0), is(555));
         initarray.add(555);
@@ -103,8 +104,16 @@ public class SimpleArrayTest {
     }
 
     @Test
-    public void getLength() {
-        assertThat(initarray.length, is(5));
-        assertThat(array.length, is(4));
+    public void getLengthArray() {
+        assertThat(initarray.length(), is(5));
+        assertThat(array.length(), is(4));
+    }
+
+    @Test
+    public void whenCalltoString() {
+        SimpleArray<Integer> s = new SimpleArray<Integer>(3);
+        s.add(1);
+        s.add(2);
+        assertEquals("1 2 null ", s.toString());
     }
 }
