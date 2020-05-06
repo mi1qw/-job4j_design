@@ -21,7 +21,7 @@ public final class Zip {
         new Zip().argZip(args);
     }
 
-    void argZip(final String[] args) throws Wrongkey, UseKeyDEO, IOException {
+    protected void argZip(final String[] args) throws Wrongkey, UseKeyDEO, IOException {
         ArgZip arg = new ArgZip(args);
         if (arg.valid()) {
             SearchFiles visitor = new SearchFiles(arg.exclude());

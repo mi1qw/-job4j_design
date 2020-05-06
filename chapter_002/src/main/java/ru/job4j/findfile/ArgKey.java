@@ -18,12 +18,12 @@ class ArgKey {
      * - путь исследуемой паки
      * - имя конечного файла для найденных результатов
      */
-    final String key;
-    final String text;
-    final List<String> data;
-    final boolean cons;
-    final ArgFuncIn func;
-    int num = 0;
+    protected final String key;
+    protected final String text;
+    protected final List<String> data;
+    protected final boolean cons;
+    protected final ArgFuncIn func;
+    protected int num = 0;
 
     ArgKey(final String key, final String text, final List<String> data, final boolean cons, final ArgFuncIn func) {
         this.key = key;

@@ -17,14 +17,14 @@ class ArgZip {
      * @param Map<String, ArgKey> param коллекция всех допустимых ключей, тип ArgKey
      */
     private boolean valid = false;
-    private final int numcons = 2;
+    private static final int NUMCONS = 2;
     private final Map<String, ArgKey> param = new HashMap<>();
     private final String[] args;
     private final List<String> directory = new ArrayList<>();
     private final List<String> exclude = new ArrayList<>();
     private final List<String> output = new ArrayList<>();
 
-    ArgZip(final String[] args) {
+    protected ArgZip(final String[] args) {
         this.args = args;
         param.put("-d", new ArgKey("-d", " Specify a path to a directory wich must be ziped",
                 directory, true, new ValidDirectory()));
@@ -34,7 +34,7 @@ class ArgZip {
                 output, true, new ValidOutput()));
     }
 
-    boolean valid() throws Wrongkey, UseKeyDEO {
+    protected boolean valid() {
         if (!this.valid) {
             try {
                 ArgKey data = null;
@@ -94,7 +94,7 @@ class ArgZip {
                 num += n.getValue().data.size();
             }
         }
-        return num < numcons;
+        return num < NUMCONS;
     }
 
     /**
@@ -103,7 +103,7 @@ class ArgZip {
      *
      * @return the path
      */
-    Path directory() {
+    protected Path directory() {
         return Paths.get(this.directory.get(0));
     }
 
@@ -112,7 +112,7 @@ class ArgZip {
      *
      * @return the list
      */
-    List<String> exclude() {
+    protected List<String> exclude() {
         return this.exclude;
     }
 
@@ -122,7 +122,7 @@ class ArgZip {
      *
      * @return the path
      */
-    Path output() {
+    protected Path output() {
         return Paths.get(this.output.get(0));
     }
 }

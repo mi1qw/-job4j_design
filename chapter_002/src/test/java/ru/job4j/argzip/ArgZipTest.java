@@ -4,6 +4,18 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class ArgZipTest {
+    @Test(expected = IllegalStateException.class)
+    public void mainTestZeroArg() throws Exception {
+        Zip.main(" ".split(" "));
+    }
+
+    @Test
+    public void mainZip() throws Exception {
+        String[] argm = "-d src/test/java/ru/job4j/argzip -e *.java -o project.zip".split("\\s+");
+        Zip.main(argm);
+        Assert.assertTrue(new ArgZip(argm).valid());
+    }
+
     @Test
     public void correctKeysAndAfguments() throws Wrongkey, UseKeyDEO {
         String[] args = "-d src/test/java/ru/job4j/argzip -e *.java -o project.zip".split("\\s+");

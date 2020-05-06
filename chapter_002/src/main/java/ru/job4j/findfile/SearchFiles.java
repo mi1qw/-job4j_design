@@ -35,7 +35,7 @@ class SearchFiles implements FileVisitor<Path> {
     /**
      * @return the files
      */
-    List<Path> getFiles() {
+    protected List<Path> getFiles() {
         return list;
     }
 
