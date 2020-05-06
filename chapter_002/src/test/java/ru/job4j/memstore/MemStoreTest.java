@@ -28,6 +28,7 @@ public class MemStoreTest {
     public void findById() {
         role.add(cat);
         assertNotNull(role.findById("myau"));
+        assertNull(role.findById("Waw"));
     }
 
     @Test
@@ -40,7 +41,6 @@ public class MemStoreTest {
         user.add(dog);
         assertNotNull(user.findById("Waw"));
     }
-    //assertThat(role.findById("myau"), is());
 
     @Test
     public void replace() {
