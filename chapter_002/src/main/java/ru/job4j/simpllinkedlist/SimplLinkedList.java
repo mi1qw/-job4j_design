@@ -1,14 +1,19 @@
 package ru.job4j.simpllinkedlist;
 
-import java.util.*;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
 public class SimplLinkedList<T> implements Iterable<T> {
     private Node<T> last;
+    private Node<T> first;
     private int size;
     private int modCount = 0;
 
     public SimplLinkedList() {
         this.last = null;
+        this.first = null;
     }
 
     /**
@@ -17,9 +22,16 @@ public class SimplLinkedList<T> implements Iterable<T> {
      * @param value the value
      */
     public void add(final T value) {
-        ++modCount;
+        Node<T> node = new Node<>(value, null);
+        if (first == null) {
+            this.first = node;
+            this.last = node;
+        } else {
+            this.last.next = node;
+            this.last = node;
+        }
         ++size;
-        this.last = new Node<>(value, last);
+        ++modCount;
     }
 
     /**
@@ -30,11 +42,11 @@ public class SimplLinkedList<T> implements Iterable<T> {
      */
     public T get(final int index) {
         Objects.checkIndex(index, size);
-        int idex = this.size - index - 1;
+        int idex = index;
 
-        Node<T> current = this.last;
+        Node<T> current = this.first;
         while (idex-- != 0) {
-            current = current.previos;
+            current = current.next;
         }
         return current.value;
     }
@@ -59,20 +71,9 @@ public class SimplLinkedList<T> implements Iterable<T> {
      */
     @Override
     public Iterator<T> iterator() {
-        if (size == 0) {
-            throw new NoSuchElementException();
-        }
-        Object[] array = new Object[size];
-        Node<T> current = last;
-        int n = size;
-        while (current.previos != null) {
-            array[--n] = current;
-            current = current.previos;
-        }
-        array[--n] = current;
         return new Iterator<T>() {
             private int expectedModCount = modCount;
-            private int n = 0;
+            private Node<T> current = first;
 
             /**
              * Returns {@code true} if the iteration has more elements.
@@ -83,7 +84,7 @@ public class SimplLinkedList<T> implements Iterable<T> {
              */
             @Override
             public boolean hasNext() {
-                return n < size;
+                return current != null;
             }
 
             /**
@@ -98,8 +99,9 @@ public class SimplLinkedList<T> implements Iterable<T> {
                     throw new NoSuchElementException();
                 }
                 checkForModification(expectedModCount);
-                Node<T> m = (Node<T>) array[n++];
-                return m.value;
+                T value = current.value;
+                current = current.next;
+                return value;
             }
         };
     }
@@ -113,15 +115,11 @@ public class SimplLinkedList<T> implements Iterable<T> {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        ArrayDeque<Node<T>> stack = new ArrayDeque<>();
-        Node<T> current = this.last;
-        while (current.previos != null) {
-            stack.push(current);
-            current = current.previos;
+        Node<T> current = this.first;
+        while (current != null) {
+            sb.append(current.value).append(" ");
+            current = current.next;
         }
-        stack.push(current);
-
-        stack.stream().forEach(n -> sb.append(n.value).append(" "));
         return sb.toString();
     }
 }
