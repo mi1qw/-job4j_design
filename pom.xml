@@ -20,11 +20,6 @@
         <maven.compiler.source>13</maven.compiler.source>
         <maven.compiler.target>13</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <!--        <sonar.projectKey>mi1qw_-job4j_design</sonar.projectKey>-->
-        <!--        <sonar.organization>ru.job4j:tracker</sonar.organization>-->
-        <!--        <sonar.host.url>http://localhost:9000</sonar.host.url>-->
-        <!--        <sonar.login>556edd80b3c562901268b8ea170163d68d588b9b</sonar.login>-->
     </properties>
     <dependencies>
         <dependency>
@@ -116,7 +111,6 @@
                                 <exclude>ru/job4j/tictactoe/</exclude>
                                 <exclude>ru/job4j/lspfood/</exclude>
                                 <exclude>ru/job4j/ispmenu/</exclude>
-                                <exclude>ru/job4j/kiss/</exclude>
                                 <exclude>ru/job4j/lspparking/</exclude>
                                 <exclude>ru/job4j/simplegenerator/</exclude>
                                 <exclude>ru/job4j/srp/</exclude>

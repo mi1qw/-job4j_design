@@ -49,6 +49,7 @@ public class SimpleArrayList<T> implements Iterable<T> {
      * @param index the index
      * @return the t
      */
+    @SuppressWarnings("unchecked")
     public T get(final int index) {
         Objects.checkIndex(index, size);
         return (T) this.array[index];
@@ -107,6 +108,7 @@ public class SimpleArrayList<T> implements Iterable<T> {
              * @return the next element in the iteration
              * @throws NoSuchElementException if the iteration has no more elements
              */
+            @SuppressWarnings("unchecked")
             @Override
             public T next() {
                 if (!hasNext()) {
