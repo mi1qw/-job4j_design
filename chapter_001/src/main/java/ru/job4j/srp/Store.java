@@ -9,10 +9,10 @@ public interface Store {
 }
 
 
-interface N {
-    public static final String N = System.lineSeparator();
+interface Nrn {
+    String N = System.lineSeparator();
 
-    public default String n() {
+    default String nRN() {
         return N;
     }
 }

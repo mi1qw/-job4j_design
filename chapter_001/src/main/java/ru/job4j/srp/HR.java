@@ -8,12 +8,13 @@ import java.util.function.Predicate;
 class HR implements AllEmployers {
     private Store store;
 
-    public HR(Store store) {
+    protected HR(final Store store) {
         this.store = store;
     }
 
     @Override
-    public String generateFormat(Predicate<Employer> filter, Comparator<Employer> comparator, Format format) {
+    public String generateFormat(final Predicate<Employer> filter, final Comparator<Employer> comparator,
+                                 final Format format) {
         StringBuilder text = new StringBuilder();
         text.append("${head}")
                 .append("${p}Name; Salary;${/p}")
@@ -24,12 +25,12 @@ class HR implements AllEmployers {
         }
         text.append("${/Employees}")
                 .append("${/head}");
-
-        return SimpleGenerator.simpleGenerator(text.toString(), new Report().getformat(format));
+        SimpleGenerator s = new SimpleGenerator();
+        return s.simpleGenerator(text.toString(), new Report().getformat(format));
     }
 
     @Override
-    public String generate(Predicate<Employer> filter, Comparator<Employer> comparator) {
+    public String generate(final Predicate<Employer> filter, final Comparator<Employer> comparator) {
         StringBuilder text = new StringBuilder();
         text.append("Name; Salary;")
                 .append(System.lineSeparator());

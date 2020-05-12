@@ -1,5 +1,6 @@
 package ru.job4j.srp;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,14 +9,14 @@ enum Format {
 }
 
 
-class Report implements N {
-    static Map<String, String> html = new HashMap<>();
-    static Map<String, String> xml = new HashMap<>();
-    static Map<String, String> json = new HashMap<>();
-    static Map<String, String> console = new HashMap<>();
-    static Map<Format, Map<String, String>> formatMapMap = new HashMap<>();
+class Report implements Nrn {
+    private static Map<String, String> html = new HashMap<>();
+    private static Map<String, String> xml = new HashMap<>();
+    private static Map<String, String> json = new HashMap<>();
+    private static Map<String, String> console = new HashMap<>();
+    private static Map<Format, Map<String, String>> formatMapMap = new EnumMap<>(Format.class);
 
-    public Report() {
+    protected Report() {
         setHtml();
         setXml();
         setJson();
@@ -108,7 +109,7 @@ class Report implements N {
         formatMapMap.put(Format.CONSOLE, console);
     }
 
-    public Map<String, String> getformat(Format format) {
+    public Map<String, String> getformat(final Format format) {
         return formatMapMap.get(format);
     }
 }
