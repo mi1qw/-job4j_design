@@ -23,7 +23,7 @@ public final class Findfile {
         new Findfile().findFile(args);
     }
 
-    void findFile(final String[] args) throws Wrongkey, UseKeyDEO, IOException {
+    protected void findFile(final String[] args) throws IOException {
         ArgFindfile arg = new ArgFindfile(args);
         if (arg.valid()) {
             SearchFiles visitor = new SearchFiles(arg.getMatcher(), arg.getName());

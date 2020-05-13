@@ -8,13 +8,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Analizy {
-    List<String> listin = new ArrayList<>();
-    List<String> listout = new ArrayList<>();
-    boolean unavailable = false;
+    protected List<String> listin = new ArrayList<>();
+    protected List<String> listout = new ArrayList<>();
+    private boolean unavailable = false;
 
-    public void unavailable(String source, String target) {
+    /**
+     * @param source
+     * @param target
+     */
+    public void unavailable(final String source, final String target) {
         System.out.println();
-
         String begin = "";
         String end;
         String line;
@@ -40,11 +43,7 @@ public class Analizy {
         savefile(target);
     }
 
-    public static void main(String[] args) {
-        new Analizy().unavailable("chapter_002/data/server.csv", "chapter_002/data/unavailable.csv");
-    }
-
-    void readfile(String path) {
+    public final void readfile(final String path) {
         try (BufferedReader read = new BufferedReader(new FileReader(path))) {
             read.lines().forEach(n -> this.listin.add(n));
         } catch (Exception e) {
@@ -52,7 +51,7 @@ public class Analizy {
         }
     }
 
-    void savefile(String target) {
+    public final void savefile(final String target) {
         try (PrintWriter out = new PrintWriter(new FileOutputStream(target))) {
             listout.stream().forEach(n -> out.println(n));
         } catch (Exception e) {

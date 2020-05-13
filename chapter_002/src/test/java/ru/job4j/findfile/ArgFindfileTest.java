@@ -13,6 +13,17 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class ArgFindfileTest {
+    @Test(expected = IllegalStateException.class)
+    public void mainTestZeroArg() throws IOException {
+        Findfile.main(" ".split(" "));
+    }
+
+    @Test
+    public void mainTest() throws IOException {
+        Findfile.main("-d src/main/java/ru/job4j/findfile -n *.java -m -o log.txt".split("\\s+"));
+        assertThat("1", true);
+    }
+
     @Test
     public void findFilesMask() throws Wrongkey, UseKeyDEO, IOException {
         final String[] args = "-d src/main/java/ru/job4j/findfile -n *.java -m -o log.txt".split("\\s+");

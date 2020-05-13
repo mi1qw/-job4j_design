@@ -23,7 +23,7 @@ class ArgFindfile {
      * @param matcher ссылка на фунциональный методов сравнения
      */
     private boolean valid = false;
-    private final int numcons = 3;
+    private static final int NUMCONS = 3;
     private final Map<String, ArgKey> param = new HashMap<>();
     private final String[] args;
     private final List<String> directory = new ArrayList<>();
@@ -32,7 +32,7 @@ class ArgFindfile {
     private final Matchext matchext = new Matchext();
     private ArgFuncIn matcher = matchext::matchM;
 
-    ArgFindfile(final String[] args) {
+    protected ArgFindfile(final String[] args) {
         this.args = args;
         param.put("-d", new ArgKey("-d", " Specify the directory in which to start the search",
                 directory, true, new ValidDirectory()));
@@ -48,7 +48,7 @@ class ArgFindfile {
                 output, true, new ValidOutput()));
     }
 
-    boolean valid() throws Wrongkey, UseKeyDEO {
+    protected boolean valid() throws Wrongkey, UseKeyDEO {
         if (!this.valid) {
             try {
                 ArgKey data = null;
@@ -112,7 +112,7 @@ class ArgFindfile {
                 ++num;
             }
         }
-        return num < numcons;
+        return num < NUMCONS;
     }
 
     /**
@@ -130,7 +130,7 @@ class ArgFindfile {
     /**
      * @return возвращает ссылку на метод нужного способа сравнения.
      */
-    ArgFuncIn getMatcher() {
+    protected ArgFuncIn getMatcher() {
         return this.matcher;
     }
 
@@ -140,7 +140,7 @@ class ArgFindfile {
      *
      * @return the path
      */
-    Path getDirectory() {
+    protected Path getDirectory() {
         return Paths.get(this.directory.get(0));
     }
 
@@ -149,7 +149,7 @@ class ArgFindfile {
      *
      * @return the list
      */
-    List<String> getName() {
+    protected List<String> getName() {
         return this.name;
     }
 
@@ -159,7 +159,7 @@ class ArgFindfile {
      *
      * @return the path
      */
-    Path getOutput() {
+    protected Path getOutput() {
         return Paths.get(this.output.get(0));
     }
 }

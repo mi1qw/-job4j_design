@@ -8,7 +8,7 @@ import java.util.Map;
  * Ошибка воззникает при отсутсвии в наборе ключей {@code Map<String, ArgKey> param}
  */
 class Wrongkey extends RuntimeException {
-    String arg;
+    protected final String arg;
 
     /**
      * @param arg ошибочный ключ
@@ -25,7 +25,7 @@ class Wrongkey extends RuntimeException {
  * Ообязательные ключи - те с которыми код так или иначе отработает.
  */
 class UseKeyDEO extends RuntimeException {
-    Map<String, ArgKey> param;
+    protected final Map<String, ArgKey> param;
 
     /**
      * @param param Набор всех ключей командной строки
