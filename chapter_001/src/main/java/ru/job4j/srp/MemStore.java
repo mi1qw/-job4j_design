@@ -9,12 +9,17 @@ import java.util.stream.Collectors;
 public class MemStore implements Store {
     private final List<Employer> employers = new ArrayList<>();
 
-    public void add(Employer em) {
+    protected final void add(final Employer em) {
         employers.add(em);
     }
 
+    /**
+     * @param filter
+     * @param comparator
+     * @return
+     */
     @Override
-    public List<Employer> findBy(Predicate<Employer> filter, Comparator<Employer> comparator) {
+    public List<Employer> findBy(final Predicate<Employer> filter, final Comparator<Employer> comparator) {
         return employers.stream().filter(filter).sorted(comparator).collect(Collectors.toList());
     }
 }

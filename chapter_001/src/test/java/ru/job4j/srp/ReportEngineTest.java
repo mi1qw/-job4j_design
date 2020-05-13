@@ -8,7 +8,14 @@ import java.util.Comparator;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-public class ReportEngineTest implements N {
+public class ReportEngineTest implements Nrn {
+    private void display(final AllEmployers engine) {
+        System.out.println(engine.generateFormat((em -> true), Comparator.comparing(Employer::getName), Format.JSON) + nRN());
+        System.out.println(engine.generateFormat((em -> true), Comparator.comparing(Employer::getName), Format.CONSOLE) + N);
+        System.out.println(engine.generateFormat((em -> true), Comparator.comparing(Employer::getName), Format.XML) + N);
+        System.out.println(engine.generateFormat((em -> true), Comparator.comparing(Employer::getName), Format.HTML) + N);
+    }
+
     @Test
     public void progr() {
         MemStore store = new MemStore();
@@ -21,15 +28,7 @@ public class ReportEngineTest implements N {
         store.add(worker2);
 
         Prog engine = new Prog(store);
-
-        String str = engine.generateFormat((em -> true), Comparator.comparing(Employer::getName), Format.JSON);
-        System.out.println(str + N);
-        str = engine.generateFormat((em -> true), Comparator.comparing(Employer::getName), Format.CONSOLE);
-        System.out.println(str + N);
-        str = engine.generateFormat((em -> true), Comparator.comparing(Employer::getName), Format.XML);
-        System.out.println(str + N);
-        str = engine.generateFormat((em -> true), Comparator.comparing(Employer::getName), Format.HTML);
-        System.out.println(str + N);
+        display(engine);
 
         StringBuilder expect = new StringBuilder()
                 .append("<!DOCTYPE HTML>"
@@ -83,15 +82,8 @@ public class ReportEngineTest implements N {
         store.add(worker4);
 
         Buh engine = new Buh(store);
+        display(engine);
 
-        String str = engine.generateFormat((em -> true), Comparator.comparing(Employer::getName), Format.JSON);
-        System.out.println(str + N);
-        str = engine.generateFormat((em -> true), Comparator.comparing(Employer::getName), Format.CONSOLE);
-        System.out.println(str + N);
-        str = engine.generateFormat((em -> true), Comparator.comparing(Employer::getName), Format.XML);
-        System.out.println(str + N);
-        str = engine.generateFormat((em -> true), Comparator.comparing(Employer::getName), Format.HTML);
-        System.out.println(str + N);
         StringBuilder expect = new StringBuilder()
 
                 .append("Name; Hired; Fired; Salary;")
