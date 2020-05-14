@@ -28,7 +28,6 @@ public class ForwardLinkList<T> implements Iterable<T> {
      * Revert.
      */
     public void revert() {
-
         Node<T> prev = new Node<>(null, head);
         Node<T> current = head;
         Node<T> tail;
@@ -36,13 +35,9 @@ public class ForwardLinkList<T> implements Iterable<T> {
         int lastT = -1;
         int numT = 0;
         while (lastT != 0) {
-            while (lastT != 0) {
-                if (current.next == null) {
-                    break;
-                }
+            while (current.next != null && lastT != 0) {
                 tail = current.next;
                 swap(prev, current, tail);
-
                 prev = tail;
                 ++numT;
                 --lastT;
