@@ -1,11 +1,14 @@
 package ru.job4j.echoserver;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class EchoServer {
@@ -22,6 +25,7 @@ public class EchoServer {
         new EchoServer().server();
     }
 
+    @SuppressFBWarnings("UNENCRYPTED_SERVER_SOCKET")
     private void server() throws IOException {
         String answer = "";
         try (ServerSocket server = new ServerSocket(9000)) {
@@ -32,14 +36,14 @@ public class EchoServer {
         System.out.println("Server is stoped");
     }
 
-    String start(final Socket socket) {
+    protected final String start(final Socket socket) {
         String answer = "";
         try (OutputStream out = socket.getOutputStream();
              BufferedReader in = new BufferedReader(
-                     new InputStreamReader(socket.getInputStream()))) {
+                     new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8))) {
             while (in.ready()) {
                 String str = in.readLine();
-                System.out.println(str);
+                System.out.println("Server " + str);
                 if (str.matches("GET.+HTTP/1.1")) {
                     answer = getMesage(str);
                 }
