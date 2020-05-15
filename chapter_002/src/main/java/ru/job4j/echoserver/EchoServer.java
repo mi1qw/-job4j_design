@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+//@SuppressFBWarnings("NP_DEREFERENCE_OF_READLINE_VALUE")
 public class EchoServer {
     private static final String LN = System.lineSeparator();
     private final Map<String, String> map = Map.of(
@@ -29,29 +30,30 @@ public class EchoServer {
     private void server() throws IOException {
         String answer = "";
         try (ServerSocket server = new ServerSocket(9000)) {
-            while (!answer.equals("Exit")) {
+            while (!"Exit".equals(answer)) {
                 answer = start(server.accept());
             }
         }
         System.out.println("Server is stoped");
     }
 
-    protected final String start(final Socket socket) {
+    @SuppressFBWarnings("RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE")
+    protected final String start(final Socket socket) throws IOException {
         String answer = "";
         try (OutputStream out = socket.getOutputStream();
              BufferedReader in = new BufferedReader(
                      new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8))) {
-            while (in.ready()) {
-                String str = in.readLine();
+            String str;
+            while (in.ready() && !"Exit".equals(answer) && (str = in.readLine()) != null) {
                 System.out.println("Server " + str);
-                if (str.matches("GET.+HTTP/1.1")) {
-                    answer = getMesage(str);
-                }
+                answer = getMesage(str);
             }
-            out.write(("HTTP/1.1 200 OK" + LN + LN).getBytes());
-            out.write(answer.getBytes());
+            out.write(("HTTP/1.1 200 OK" + LN + LN).getBytes(StandardCharsets.UTF_8));
+            out.write(answer.getBytes(StandardCharsets.UTF_8));
+            out.flush();
         } catch (IOException e) {
             e.printStackTrace();
+            throw new IOException();
         }
         return answer;
     }

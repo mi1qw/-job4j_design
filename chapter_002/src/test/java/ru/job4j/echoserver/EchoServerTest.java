@@ -1,16 +1,19 @@
 package ru.job4j.echoserver;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertTrue;
 
 class ClientThread implements Runnable {
     /**
@@ -24,24 +27,28 @@ class ClientThread implements Runnable {
      *
      * @see Thread#run()
      */
-    //@SuppressFBWarnings({"UNENCRYPTED_SOCKET", "DM_DEFAULT_ENCODING"})
     @SuppressFBWarnings({"UNENCRYPTED_SOCKET"})
     @Override
     public void run() {
         System.out.println(Thread.currentThread().getName());
-        int m = 100;
-        while (m-- != 0) {
-            try {
-                try (Socket socket = new Socket("127.0.0.1", 9000);
-                     InputStreamReader inputStreamReader
-                             = new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8);
-                     BufferedReader reader = new BufferedReader(inputStreamReader);
-                     PrintWriter writer = new PrintWriter(socket.getOutputStream(), true, StandardCharsets.UTF_8)) {
-                    writer.println("GET /?msg=Exit HTTP/1.1");
-                    System.out.println("Client sended");
-                    String str = reader.readLine();
-                    System.out.println("Client get -  " + str);
+        int n = 200;
+        while (n-- != 0) {
+            try (
+                    Socket socket = new Socket(InetAddress.getLoopbackAddress(), 9000);
+                    InputStreamReader inputStreamReader = new InputStreamReader(
+                            socket.getInputStream(), StandardCharsets.UTF_8);
+                    BufferedReader reader = new BufferedReader(inputStreamReader);
+                    PrintWriter writer = new PrintWriter(
+                            socket.getOutputStream(), true, StandardCharsets.UTF_8)) {
+                while (reader.ready()) {
+                    System.out.println("Client get - " + reader.readLine());
                 }
+                writer.println("GET /?msg=Exit HTTP/1.1");
+                writer.flush();
+                System.out.println("Client sended");
+                await().atLeast(50, TimeUnit.MILLISECONDS)
+                        .atMost(3000, TimeUnit.MILLISECONDS)
+                        .until(socket::isConnected);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -60,31 +67,50 @@ public class EchoServerTest extends Mockito {
         alpha.start();
 
         EchoServer.main("".split(""));
-        assertThat(1, Matchers.is(1));
+        assertTrue(true);
     }
 
     @Test
     public void whenAskedHello() throws IOException {
         this.testServer("GET /?msg=Hello HTTP/1.1", "HTTP/1.1 200 OK" + LN + LN.
                 concat("Hello, dear friend."));
+        assertTrue(true);
     }
 
     @Test
     public void whenAskedWhat() throws IOException {
         this.testServer("GET /?msg=What HTTP/1.1", "HTTP/1.1 200 OK" + LN + LN.
                 concat("What do you want from me?"));
+        assertTrue(true);
     }
 
     @Test
     public void whenAskedExit() throws IOException {
         this.testServer("GET /?msg=Exit HTTP/1.1", "HTTP/1.1 200 OK" + LN + LN.
                 concat("Exit"));
+        assertTrue(true);
     }
 
     @Test
     public void whenAskedAnything() throws IOException {
         this.testServer("GET /?msg=Anything HTTP/1.1", "HTTP/1.1 200 OK" + LN + LN.
                 concat("Anything"));
+        assertTrue(true);
+    }
+
+    @Test
+    public void whenAskedEmpty() throws IOException {
+        this.testServer("", "HTTP/1.1 200 OK" + LN + LN);
+        assertTrue(true);
+    }
+
+    @Test(expected = IOException.class)
+    public void whenException() throws IOException {
+        Socket socket = mock(Socket.class);
+        when(socket.getInputStream()).thenThrow(new IOException());
+        when(socket.getOutputStream()).thenThrow(new IOException());
+        EchoServer echoServer = new EchoServer();
+        echoServer.start(socket);
     }
 
     private void testServer(final String input, final String expected) throws IOException {
