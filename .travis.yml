@@ -2,8 +2,11 @@
 language: java
 jdk:
   - openjdk13
-sudo: false
+#  - openjdk11
 install: true
+dist: xenial
+os:
+  - linux
 
 addons:
   sonarcloud:
