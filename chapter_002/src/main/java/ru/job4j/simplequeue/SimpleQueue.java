@@ -32,10 +32,6 @@ public class SimpleQueue<T> {
         while (!in.isEmpty()) {
             out.push(in.pop());
         }
-        T val = out.pop();
-        while (!out.isEmpty()) {
-            in.push(out.pop());
-        }
-        return val;
+        return out.pop();
     }
 }
