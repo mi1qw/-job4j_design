@@ -4,10 +4,19 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-public class SimpleArray<T> implements Iterable<T> {
+public class SimpleArray<T> implements Iterable<T>, ArrayInterf<T> {
     private final T[] array;
     private final int size;
-    private int length;
+    private int cell;
+    private static final int DEFAULT_CAPACITY = 50;
+
+    /**
+     * Конструктор.
+     * пустой, по умолчанию на 50 ячеек
+     */
+    public SimpleArray() {
+        this(DEFAULT_CAPACITY);
+    }
 
     /**
      * Конструктор.
@@ -18,7 +27,7 @@ public class SimpleArray<T> implements Iterable<T> {
     @SuppressWarnings("unchecked")
     public SimpleArray(final int size) {
         this.size = size;
-        this.length = 0;
+        this.cell = -1;
         this.array = (T[]) new Object[size];
     }
 
@@ -29,32 +38,16 @@ public class SimpleArray<T> implements Iterable<T> {
      * @param array the array
      */
     public SimpleArray(final T[] array) {
-        this.array = array;
+        this.array = array.clone();
         this.size = array.length;
-        this.length = getLengthArray(array);
-    }
-
-    /**
-     * Gets length- кол-во элементов в масиве без null.
-     *
-     * @param array the array
-     * @return the length
-     */
-    private int getLengthArray(final T[] array) {
-        int lengthArray = 0;
-        for (T n : array) {
-            if (n != null) {
-                ++lengthArray;
-            }
-        }
-        return lengthArray;
+        this.cell = this.size - 1;
     }
 
     /**
      * @return the length
      */
     public int length() {
-        return this.length;
+        return this.cell + 1;
     }
 
     /**
@@ -62,15 +55,12 @@ public class SimpleArray<T> implements Iterable<T> {
      */
     @Override
     public Iterator<T> iterator() {
-        return new Iterator<T>() {
-            private int it = 0;
+        return new Iterator<>() {
+            private int it = -1;
 
             @Override
             public boolean hasNext() {
-                while (it < size && array[it] == null) {
-                    ++it;
-                }
-                return it < size;
+                return it < cell;
             }
 
             @Override
@@ -78,31 +68,24 @@ public class SimpleArray<T> implements Iterable<T> {
                 if (!hasNext()) {
                     throw new NoSuchElementException();
                 }
-                return array[it++];
+                return array[++it];
             }
         };
     }
 
     /**
-     * Add Добавить элемент model в первую пусту null ячейку.
+     * Add Добавить элемент model в последнюю ячейку.
      *
      * @param model the model
-     * @return the int позиция куда был вставлен элемент
+     * @return the boolean успешного добавления
      */
-    public int add(final T model) {
-        int m = -1;
-        for (int n = 0; n < this.size; ++n) {
-            if (array[n] == null) {
-                array[n] = model;
-                ++this.length;
-                m = n;
-                break;
-            }
-        }
-        if (m == -1) {
+    public boolean add(final Object model) {
+        if (++this.cell == size) {
             throw new ArrayIndexOutOfBoundsException();
         }
-        return m;
+        //noinspection unchecked
+        array[cell] = (T) model;
+        return true;
     }
 
     /**
@@ -114,9 +97,6 @@ public class SimpleArray<T> implements Iterable<T> {
     public void set(final int index, final T model) {
         Objects.checkIndex(index, this.size);
         array[index] = model;
-        if (model == null) {
-            --this.length;
-        }
     }
 
     /**
@@ -128,11 +108,11 @@ public class SimpleArray<T> implements Iterable<T> {
     public void remove(final int index) {
         Objects.checkIndex(index, this.size);
         System.arraycopy(array, index + 1, array, index, array.length - index - 1);
-        set(array.length - 1, null);
+        set(cell--, null);
     }
 
     /**
-     * Get Получить элемент T по ииндексу
+     * Get Получить элемент T по ииндексу.
      *
      * @param index the index
      * @return the t
@@ -148,24 +128,10 @@ public class SimpleArray<T> implements Iterable<T> {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (T t : array) {
-            if (t == null) {
-                sb.append("null").append(" ");
-            } else {
-                sb.append(t.toString()).append(" ");
-            }
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Вывести в консоль полностью массив без пустых null ячеек.
-     */
-    public void dispIterator() {
         Iterator<T> it = this.iterator();
         while (it.hasNext()) {
-            System.out.print(it.next() + " ");
+            sb.append(it.next().toString()).append(" ");
         }
-        System.out.println();
+        return sb.toString();
     }
 }
