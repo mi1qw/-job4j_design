@@ -3,6 +3,7 @@ package ru.job4j.tictactoe;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,21 +20,20 @@ import java.util.List;
 
 
 public class TicTacToe {
-    private static final String JOB4J = "Крестики-нолики www.job4j.ru";
-    private final int size = 3;
-    private final Figure3T[][] cells = new Figure3T[size][size];
+    private static final int SIZE = 3;
+    private final Figure3T[][] cells = new Figure3T[SIZE][SIZE];
     private final Logic3T logic = new Logic3T(cells);
-    boolean mark;
-    List<HumanBot> playerList = new ArrayList<>();
+    private boolean mark;
+    private List<HumanBot> playerList = new ArrayList<>();
 
-    public static void main(String[] args) throws IOException {
+    public static void main(final String[] args) throws IOException, NoSuchAlgorithmException {
         new TicTacToe().start();
     }
 
-    public void start() throws IOException {
+    public final void start() throws IOException, NoSuchAlgorithmException {
         while (true) {
-            for (int y = 0; y != this.size; y++) {
-                for (int x = 0; x != this.size; x++) {
+            for (int y = 0; y != this.SIZE; y++) {
+                for (int x = 0; x != this.SIZE; x++) {
                     cells[x][y] = new Figure3T();
                 }
             }
@@ -103,8 +103,8 @@ public class TicTacToe {
     }
 
     private void buildGrid() {
-        for (int y = 0; y != this.size; y++) {
-            for (int x = 0; x != this.size; x++) {
+        for (int y = 0; y != this.SIZE; y++) {
+            for (int x = 0; x != this.SIZE; x++) {
                 System.out.print("|");
                 if (cells[x][y].hasMarkX()) {
                     System.out.print("X");

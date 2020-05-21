@@ -1,22 +1,10 @@
 package ru.job4j.tictactoe;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 
 interface HumanBot {
-    void inputXY() throws IOException;
+    void inputXY() throws IOException, NoSuchAlgorithmException;
 }
 
 
-class Player {
-    String name;
-    boolean mark;
-    Logic3T logic;
-    int[][] marks;
-
-    public Player(String name, boolean mark, Logic3T logic) {
-        this.name = name;
-        this.mark = mark;
-        this.logic = logic;
-        marks = new int[logic.table.length][logic.table.length];
-    }
-}

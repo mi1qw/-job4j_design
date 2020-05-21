@@ -1,19 +1,25 @@
 package ru.job4j.tictactoe;
 
-class Bot extends Player implements HumanBot {
-    public Bot(String name, boolean mark, Logic3T logic) {
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Random;
+
+public class Bot extends Player implements HumanBot {
+    public Bot(final String name, final boolean mark, final Logic3T logic) {
         super(name, mark, logic);
     }
 
     @Override
-    public void inputXY() {
-        int x, y;
+    public final void inputXY() throws NoSuchAlgorithmException {
+        int x;
+        int y;
+        Random rand = SecureRandom.getInstanceStrong();
         System.out.print(this.name + ", entered CELL xy: ");
         do {
-            x = (int) (Math.random() * logic.table.length);
-            y = (int) (Math.random() * logic.table.length);
+            x = rand.nextInt(logic.table.length);
+            y = rand.nextInt(logic.table.length);
         } while (logic.isNotFree(x, y));
-        System.out.println((int) (x + 1) + "" + (int) (y + 1));
+        System.out.println((x + 1) + "" + (y + 1));
 
         logic.table[x][y].take(this.mark);
     }
