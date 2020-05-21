@@ -24,7 +24,7 @@ public class SimpleArrayTest {
         array.add(3);
         it = array.iterator();
 
-        Integer[] i = {null, null, 1, 2, null, 4, null, 6, 7};
+        Integer[] i = {99, 98, 1, 2, 97, 4, 96, 6, 7};
         initarray = new SimpleArray<>(i);
     }
 
@@ -45,7 +45,7 @@ public class SimpleArrayTest {
 
     @Test(expected = NoSuchElementException.class)
     public void whenNextFromEmpty() {
-        Iterator<Integer> it = new SimpleArray<Integer>(0).iterator();
+        Iterator<Integer> it = new SimpleArray<Integer>().iterator();
         it.next();
     }
 
@@ -67,17 +67,10 @@ public class SimpleArrayTest {
     public void remove() {
         array.remove(2);
         assertThat(array.get(2), is(3));
-
-        System.out.println(initarray);
-        initarray.dispIterator();
-        System.out.print("remove - " + initarray.get(2));
-        System.out.println("   length array " + initarray.length());
-        initarray.remove(2);
-        System.out.println(initarray);
-        initarray.dispIterator();
-        System.out.println("length array " + initarray.length());
-        System.out.println();
+        System.out.println(array);
+        initarray.remove(1);
         assertThat(initarray.get(2), is(2));
+        System.out.println(initarray);
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
@@ -87,33 +80,31 @@ public class SimpleArrayTest {
 
     @Test
     public void add() {
-        System.out.println("length array " + initarray.length());
-        System.out.println(initarray);
-        initarray.dispIterator();
-
+        System.out.println("length array " + array.length());
+        System.out.println(array);
         System.out.println("Add 555");
-        initarray.add(555);
-        System.out.println("length array " + initarray.length());
-        System.out.println(initarray);
-        initarray.dispIterator();
-        assertThat(initarray.get(0), is(555));
-        initarray.add(555);
-        assertThat(initarray.get(1), is(555));
-        initarray.add(555);
-        assertThat(initarray.get(4), is(555));
+        array.add(555);
+        System.out.println(array);
+        System.out.println("length array " + array.length());
+        assertThat(array.get(4), is(555));
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void addOutOfBounds() {
+        initarray.add(20);
     }
 
     @Test
     public void getLengthArray() {
-        assertThat(initarray.length(), is(5));
+        assertThat(initarray.length(), is(9));
         assertThat(array.length(), is(4));
     }
 
     @Test
     public void whenCalltoString() {
-        SimpleArray<Integer> s = new SimpleArray<Integer>(3);
+        SimpleArray<Integer> s = new SimpleArray<>(3);
         s.add(1);
         s.add(2);
-        assertEquals("1 2 null ", s.toString());
+        assertEquals("1 2 ", s.toString());
     }
 }
