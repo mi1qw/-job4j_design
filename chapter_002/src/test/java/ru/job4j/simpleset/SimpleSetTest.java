@@ -2,7 +2,6 @@ package ru.job4j.simpleset;
 
 import org.junit.Before;
 import org.junit.Test;
-import ru.job4j.simplearrayt.SimpleArray;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -17,7 +16,7 @@ public class SimpleSetTest {
 
     @Before
     public void setUp() {
-        set = new SimpleSet<Integer>(new SimpleArray<>(5));
+        set = new SimpleSet<Integer>(5);
         set.add(0);
         set.add(1);
         set.add(2);
@@ -25,7 +24,7 @@ public class SimpleSetTest {
         it = set.iterator();
 
         Integer[] i = {99, 98, 1, 2, 97, 4, 96, 6, 7};
-        initSet = new SimpleSet<Integer>(new SimpleArray<>(i));
+        initSet = new SimpleSet<Integer>(i);
     }
 
     @Test
@@ -55,28 +54,30 @@ public class SimpleSetTest {
 
     @Test(expected = NoSuchElementException.class)
     public void whenNextFromEmpty() {
-        new SimpleSet<Integer>(new SimpleArray<Integer>()).iterator().next();
+        new SimpleSet<Integer>().iterator().next();
     }
 
     @Test
     public void whenRemove() {
+        assertThat(set.contains(2), is(true));
         set.remove(2);
-        assertThat(set.get(2), is(3));
+        assertThat(set.contains(2), is(false));
         System.out.println(set);
-        initSet.remove(1);
-        assertThat(initSet.get(2), is(2));
-        assertThat(initSet.length(), is(8));
+
+        assertThat(initSet.contains(98), is(true));
+        initSet.remove(98);
+        assertThat(initSet.contains(98), is(false));
         System.out.println(initSet);
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void removeOutOfBounds() {
-        set.remove(20);
+        assertThat(set.remove(20), is(false));
     }
 
     @Test
-    public void getLengthSet() {
-        assertThat(initSet.length(), is(9));
-        assertThat(set.length(), is(4));
+    public void getSizethSet() {
+        assertThat(initSet.size(), is(9));
+        assertThat(set.size(), is(4));
     }
 }
