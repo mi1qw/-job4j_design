@@ -26,6 +26,6 @@ public class UserTest {
         System.out.println(map);
         System.out.println("user1 == user2 ? - " + (user1 == user2));
         System.out.println("user1 equals user2 ? - " + (user1.equals(user2)));
-        assertThat(user1.equals(user2), is(false));
+        assertThat(user1.equals(user2), is(true));
     }
 }

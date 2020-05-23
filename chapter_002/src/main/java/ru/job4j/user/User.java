@@ -14,15 +14,32 @@ public class User {
         this.birthday = birthday;
     }
 
+    ///**
+    // * Переопределить hashCode.
+    // *
+    // * @return hash только значимых полей
+    // */
+    //@SuppressWarnings("CheckStyle")
+    //@Override
+    //public int hashCode() {
+    //    return Objects.hash(name, children, birthday);
+    //}
+
     /**
-     * Переопределить hashCode.
+     * Переопределить equals.
      *
      * @return hash только полей
      */
-    @SuppressWarnings("CheckStyle")
     @Override
-    public int hashCode() {
-        return Objects.hash(name, children, birthday);
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        User user = (User) o;
+        return children == user.children && name.equals(user.name) && birthday.equals(user.birthday);
     }
 
     @Override
