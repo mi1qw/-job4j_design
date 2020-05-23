@@ -1,6 +1,7 @@
 package ru.job4j.user;
 
 import java.util.Calendar;
+import java.util.Objects;
 
 public class User {
     private String name;
@@ -11,6 +12,17 @@ public class User {
         this.name = name;
         this.children = children;
         this.birthday = birthday;
+    }
+
+    /**
+     * Переопределить hashCode.
+     *
+     * @return hash только полей
+     */
+    @SuppressWarnings("CheckStyle")
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, children, birthday);
     }
 
     @Override
