@@ -14,16 +14,16 @@ public class User {
         this.birthday = birthday;
     }
 
-    ///**
-    // * Переопределить hashCode.
-    // *
-    // * @return hash только значимых полей
-    // */
-    //@SuppressWarnings("CheckStyle")
-    //@Override
-    //public int hashCode() {
-    //    return Objects.hash(name, children, birthday);
-    //}
+    /**
+     * Переопределить hashCode.
+     *
+     * @return hash только значимых полей
+     */
+    @SuppressWarnings("CheckStyle")
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, children, birthday);
+    }
 
     /**
      * Переопределить equals.
