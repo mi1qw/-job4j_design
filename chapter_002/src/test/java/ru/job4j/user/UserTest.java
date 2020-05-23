@@ -20,9 +20,9 @@ public class UserTest {
                 1,
                 new GregorianCalendar(1995, Calendar.JANUARY, 25));
 
-        Map<User, Object> map = new HashMap<>();
-        map.put(user1, this);
-        map.put(user2, this);
+        Map<User, String> map = new HashMap<>();
+        map.put(user1, "one");
+        map.put(user2, "two");
         System.out.println(map);
         System.out.println("user1 == user2 ? - " + (user1 == user2));
         System.out.println("user1 equals user2 ? - " + (user1.equals(user2)));
