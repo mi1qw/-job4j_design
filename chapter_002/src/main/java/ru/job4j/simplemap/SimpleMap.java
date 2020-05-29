@@ -1,16 +1,18 @@
 package ru.job4j.simplemap;
 
-import java.util.*;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class SimpleMap<K, V> implements Iterable<SimpleMap.Node<K, V>> {
     /**
      * The default initial capacity - MUST be a power of two.
      */
-    static final int DEFAULT_INITIAL_CAPACITY = 1 << 3; // 1 << 4 aka 16
+    private static final int DEFAULT_INITIAL_CAPACITY = 1 << 3; // 1 << 4 aka 16
     /**
      * The load factor used when none specified in constructor.
      */
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     /**
      * The table, initialized on first use, and resized as
      * necessary. When allocated, length is always a power of two.
@@ -18,11 +20,6 @@ public class SimpleMap<K, V> implements Iterable<SimpleMap.Node<K, V>> {
      * bootstrapping mechanics that are currently not needed.)
      */
     private Node<K, V>[] table;
-    /**
-     * Holds cached entrySet(). Note that AbstractMap fields are used
-     * for keySet() and values().
-     */
-    private Set<Map.Entry<K, V>> entrySet;
     /**
      * The number of key-value mappings contained in this map.
      */
@@ -93,7 +90,7 @@ public class SimpleMap<K, V> implements Iterable<SimpleMap.Node<K, V>> {
      * @param key the key
      * @return the int
      */
-    static final int hash(final Object key) {
+    private static int hash(final Object key) {
         int h;
         if (key == null) {
             return 0;
@@ -109,146 +106,8 @@ public class SimpleMap<K, V> implements Iterable<SimpleMap.Node<K, V>> {
      * @param cap the cap
      * @return the int
      */
-    static int tableSizeFor(final int cap) {
+    private static int tableSizeFor(final int cap) {
         return (-1 >>> Integer.numberOfLeadingZeros(cap - 1)) + 1;
-    }
-
-    /**
-     * Returns the number of key-value mappings in this map.
-     *
-     * @return the number of key-value mappings in this map
-     */
-    public int size() {
-        return size;
-    }
-
-    /**
-     * Returns the value to which the specified key is mapped,
-     * or {@code null} if this map contains no mapping for the key.
-     * distinguish these two cases.
-     *
-     * @param key the key
-     * @return the v
-     */
-    public V get(final Object key) {
-        Node<K, V> e = getNode(hash(key), key);
-        return (e == null) ? null : e.value;
-    }
-
-    /**
-     * Implements Map.get and related methods.
-     *
-     * @param hash hash for key
-     * @param key  the key
-     * @return the node, or null if none
-     */
-    final Node<K, V> getNode(final int hash, final Object key) {
-        Node<K, V>[] tab = table;
-        int n = tab.length;
-        Node<K, V> first = tab[(n - 1) & hash];
-        if (tab != null && n > 0 && first != null) {
-            K k = first.key;
-            if (first.hash == hash && (k == key || (key != null && key.equals(k)))) {
-                return first;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Create a regular  node
-     *
-     * @param hash  hash
-     * @param key   key
-     * @param value value
-     * @param next  next
-     * @return Node
-     */
-    Node<K, V> newNode(final int hash, final K key, final V value, final Node<K, V> next) {
-        return new Node<>(hash, key, value, next);
-    }
-
-    /**
-     * Associates the specified value with the specified key in this map.
-     * If the map previously contained a mapping for the key, the old
-     * value is replaced.
-     *
-     * @param key   key with which the specified value is to be associated
-     * @param value value to be associated with the specified key
-     * @return the previous value associated with {@code key}, or {@code null} if there was no mapping for {@code key}. (A {@code null} return can also indicate that the map previously associated {@code null} with {@code key}.)
-     */
-    public boolean put(final K key, final V value) {
-        return putVal(hash(key), key, value);
-    }
-
-    /**
-     * Implements Map.put and related methods.
-     *
-     * @param hash  hash for key
-     * @param key   the key
-     * @param value the value to put
-     * @return previous value, or null if none
-     */
-    final boolean putVal(final int hash, final K key, final V value) {
-        Node<K, V>[] tab = table;
-        Node<K, V> p;
-        int n = (tab == null) ? 0 : tab.length;
-        int i;
-        if (tab == null || n == 0) {
-            tab = resize();
-            n = tab.length;
-        }
-        i = (n - 1) & hash;
-        p = tab[i];
-        if (p == null) {
-            tab[i] = newNode(hash, key, value, null);
-        } else {
-            if (p.hash == hash && ((p.key) == key || (key != null && key.equals(p.key)))) {
-                return false; //System.out.println("Блок Занят")
-            }
-        }
-        ++modCount;
-        if (++size > threshold) {
-            resize();
-        }
-        return true;
-    }
-
-    /**
-     * Removes the mapping for the specified key from this map if present.
-     *
-     * @param key key whose mapping is to be removed from the map
-     * @return the previous value associated with {@code key}, or {@code null} if there was no mapping for {@code key}. (A {@code null} return can also indicate that the map previously associated {@code null} with {@code key}.)
-     */
-    public boolean delete(final Object key) {
-        Node<K, V> e = removeNode(hash(key), key);
-        return e != null;
-    }
-
-    /**
-     * Implements Map.remove and related methods.
-     *
-     * @param hash hash for key
-     * @param key  the key
-     * @return the node, or null if none
-     */
-    private Node<K, V> removeNode(final int hash, final Object key) {
-        Node<K, V>[] tab = table;
-        int n = tab.length;
-        int index = (n - 1) & hash;
-        Node<K, V> p = tab[index];
-        if (tab != null && n > 0 && p != null) {
-            Node<K, V> node = null;
-            K k = p.key;
-            if (p.hash == hash && (k == key || (key != null && key.equals(k)))) {
-                node = p;
-                tab[index] = p.next;
-            }
-            ++modCount;
-            --size;
-            return node;
-        }
-        return null;
     }
 
     /**
@@ -260,14 +119,18 @@ public class SimpleMap<K, V> implements Iterable<SimpleMap.Node<K, V>> {
      *
      * @return the table
      */
-    final Node<K, V>[] resize() {
+    private Node<K, V>[] resize() {
         Node<K, V>[] oldTab = table;
         int oldCap = (oldTab == null) ? 0 : oldTab.length;
+        int oldThr = threshold;
         int newCap;
-        int newThr;
+        int newThr = 0;
         if (oldCap != 0) {
             newCap = oldCap << 1;
-            newThr = (int) (DEFAULT_LOAD_FACTOR * newCap);
+            newThr = (int) (loadFactor * newCap);
+        } else if (oldThr > 0) { // initial capacity was placed in threshold
+            newCap = oldThr;
+            newThr = (int) (loadFactor * newCap);
         } else {
             newCap = DEFAULT_INITIAL_CAPACITY;
             newThr = (int) (DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
@@ -287,6 +150,154 @@ public class SimpleMap<K, V> implements Iterable<SimpleMap.Node<K, V>> {
             }
         }
         return newTab;
+    }
+
+    /**
+     * Returns the number of key-value mappings in this map.
+     *
+     * @return the number of key-value mappings in this map
+     */
+    public int size() {
+        return size;
+    }
+
+    /**
+     * Сравнить используя хеш и ключи.
+     *
+     * @param p    значение хештаблицы
+     * @param hash хеш ключа
+     * @param key  ключ
+     * @return True если равны
+     */
+    private boolean equalKeys(final Node<K, V> p, final int hash, final K key) {
+        return p.hash == hash && ((p.key) == key || (key != null && key.equals(p.key)));
+    }
+
+    /**
+     * Returns the value to which the specified key is mapped,
+     * or {@code null} if this map contains no mapping for the key.
+     * distinguish these two cases.
+     *
+     * @param key the key
+     * @return the v
+     */
+    public V get(final K key) {
+        Node<K, V> e = getNode(hash(key), key);
+        return (e == null) ? null : e.value;
+    }
+
+    /**
+     * Implements Map.get and related methods.
+     *
+     * @param hash hash for key
+     * @param key  the key
+     * @return the node, or null if none
+     */
+    private Node<K, V> getNode(final int hash, final K key) {
+        if (table != null) {
+            int n = table.length;
+            Node<K, V> p = table[(n - 1) & hash];
+            if (p != null && equalKeys(p, hash, key)) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Create a regular  node
+     *
+     * @param hash  hash
+     * @param key   key
+     * @param value value
+     * @param next  next
+     * @return Node
+     */
+    private Node<K, V> newNode(final int hash, final K key, final V value, final Node<K, V> next) {
+        return new Node<>(hash, key, value, next);
+    }
+
+    /**
+     * Associates the specified value with the specified key in this map.
+     * If the map previously contained a mapping for the key, the old
+     * value is replaced.
+     *
+     * @param key   key with which the specified value is to be associated
+     * @param value value to be associated with the specified key
+     * @return the previous value associated with {@code key}, or {@code null} if there was no mapping for {@code key}. (A {@code null} return can also indicate that the map previously associated {@code null} with {@code key}.)
+     */
+    public boolean insert(final K key, final V value) {
+        return putVal(hash(key), key, value);
+    }
+
+    /**
+     * Implements Map.put and related methods.
+     *
+     * @param hash  hash for key
+     * @param key   the key
+     * @param value the value to put
+     * @return previous value, or null if none
+     */
+    private boolean putVal(final int hash, final K key, final V value) {
+        Node<K, V>[] tab = table;
+        Node<K, V> p;
+        int n = (tab == null) ? 0 : tab.length;
+        if (n == 0) {
+            tab = resize();
+            n = tab.length;
+        }
+        int i = (n - 1) & hash;
+        p = tab[i];
+        if (p == null) {
+            tab[i] = newNode(hash, key, value, null);
+        } else {
+            if (equalKeys(p, hash, key)) {
+                tab[i].value = value;
+                return true; // обновляем значение
+            }
+            return false;    //коллизия. Выходим, без добавления элемента
+        }
+        ++modCount;
+        if (++size > threshold) {
+            resize();
+        }
+        return true;
+    }
+
+    /**
+     * Removes the mapping for the specified key from this map if present.
+     *
+     * @param key key whose mapping is to be removed from the map
+     * @return the previous value associated with {@code key}, or {@code null} if there was no mapping for {@code key}. (A {@code null} return can also indicate that the map previously associated {@code null} with {@code key}.)
+     */
+    public boolean delete(final K key) {
+        Node<K, V> e = removeNode(hash(key), key);
+        return e != null;
+    }
+
+    /**
+     * Implements Map.remove and related methods.
+     *
+     * @param hash hash for key
+     * @param key  the key
+     * @return the node, or null if none
+     */
+    private Node<K, V> removeNode(final int hash, final K key) {
+        Node<K, V>[] tab = table;
+        Node<K, V> node = null;
+        if (tab != null) {
+            int n = tab.length;
+            int index = (n - 1) & hash;
+            Node<K, V> p = tab[index];
+            if (p != null && equalKeys(p, hash, key)) {
+                node = p;
+                tab[index] = p.next;
+                ++modCount;
+                --size;
+                return node;
+            }
+        }
+        return null;
     }
 
     private void checkForModification(final int expectedModCount) {
@@ -309,13 +320,10 @@ public class SimpleMap<K, V> implements Iterable<SimpleMap.Node<K, V>> {
              */
             @Override
             public boolean hasNext() {
-                if (table == null) {
-                    return false;
-                }
-                while (it < table.length && table[it] == null) {
+                while (table != null && it < table.length && table[it] == null) {
                     ++it;
                 }
-                return it < table.length;
+                return table != null && it < table.length;
             }
 
             /**
