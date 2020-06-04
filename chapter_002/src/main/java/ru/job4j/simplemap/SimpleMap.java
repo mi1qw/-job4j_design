@@ -252,8 +252,10 @@ public class SimpleMap<K, V> implements Iterable<SimpleMap.Node<K, V>> {
             tab[i] = newNode(hash, key, value, null);
         } else {
             if (equalKeys(p, hash, key)) {
-                return false; //System.out.println("Блок Занят")
+                tab[i].value = value;
+                return true; // обновляем значение
             }
+            return false;    //коллизия. Выходим, без добавления элемента
         }
         ++modCount;
         if (++size > threshold) {

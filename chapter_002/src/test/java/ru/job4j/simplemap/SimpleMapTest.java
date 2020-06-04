@@ -51,7 +51,7 @@ public class SimpleMapTest<T> {
 
     @Test(expected = ConcurrentModificationException.class)
     public void whenCorruptedItByPut() {
-        map.insert(10, "10");
+        map.insert(4, "4");
         itMap.next();
     }
 
@@ -107,9 +107,15 @@ public class SimpleMapTest<T> {
 
     @Test
     public void whenPutInBusyNodeThenNull() {
-        assertFalse(map.insert(1, "q"));
+        assertTrue(map.insert(1, "q"));
     }
 
+    @Test
+    public void whenGetCollision() {
+        assertFalse(map.insert(10, "10"));
+    }
+
+    //map.insert(10, "10");
     @Test
     public void whenMapShouldGrow() {
         for (int n = 4; n != 8; ++n) {
@@ -122,7 +128,5 @@ public class SimpleMapTest<T> {
     public void anotherTests() {
         SimpleMap<Integer, Integer> bb = new SimpleMap<>(1, 0.75f);
         assertNull(bb.get(null));
-        bb.insert(null, 1);
-        assertFalse(map.insert(1, "aqa"));
     }
 }
