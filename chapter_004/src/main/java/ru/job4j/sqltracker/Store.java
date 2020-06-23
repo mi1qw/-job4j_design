@@ -21,4 +21,6 @@ public interface Store extends AutoCloseable {
     List<Item> findAll(Table table);
 
     Item findById(String id, Table table);
+
+    void truncate(Table table);
 }

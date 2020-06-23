@@ -1,5 +1,6 @@
 package ru.job4j.sqltracker;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +25,7 @@ public class SqlTracker implements Store {
      * @param item the item
      * @throws SQLException the sql exception
      */
-    public void prodStatement(final PreparedStatement st, final Item item)
+    protected void prodStatement(final PreparedStatement st, final Item item)
             throws SQLException {
         st.setString(1, item.getName());
         st.setInt(2, item.getTypeid());
@@ -37,18 +38,18 @@ public class SqlTracker implements Store {
      *
      * @param st   the st
      * @param item the item
-     * @return the prepared statement
      * @throws SQLException the sql exception
      */
-    PreparedStatement typeStatement(final PreparedStatement st,
-                                    final Item item) throws SQLException {
+    protected void typeStatement(final PreparedStatement st, final Item item)
+            throws SQLException {
         st.setString(1, item.getName());
-        return st;
     }
 
     /**
      * init.
      */
+    @SuppressWarnings("ConstantConditions")
+    @SuppressFBWarnings("RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE")
     @Override
     public void init() {
         try (InputStream in = SqlTracker.class.getClassLoader()
@@ -62,6 +63,7 @@ public class SqlTracker implements Store {
                     config.getProperty("password")
             );
         } catch (Exception e) {
+            System.out.println("qqqqqqqqqqqqqq111111111111111");
             throw new IllegalStateException(e);
         }
     }
@@ -71,11 +73,13 @@ public class SqlTracker implements Store {
      * Statement.RETURN_GENERATED_KEYS);
      *
      * @param item item
-     * @return
+     * @return String id
+     * @throws SQLException для теста
      */
+    @SuppressFBWarnings({"SQL_INJECTION_JDBC", "RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"})
     @Override
     public String add(final Item item) throws SQLException {
-        int id = 0;
+        int id;
         Table table = item.getTable();
         String tableQuery = String.format("INSERT INTO %s (%s) VALUES(%s)",
                 table.getName(),
@@ -86,19 +90,40 @@ public class SqlTracker implements Store {
                 Statement.RETURN_GENERATED_KEYS)) {
             table.getSt().statement(st, item);
             st.executeUpdate();
-            ResultSet rs = st.getGeneratedKeys();
-            id = rs.next() ? rs.getInt(1) : 0;
+            id = getResult(st);
         } catch (SQLException e) {
+            LOG.info("Ошибка");
             LOG.error(e.getMessage(), e);
+            throw new SQLException();
         }
         return String.valueOf(id);
     }
 
     /**
-     * @param id
-     * @param item
-     * @return
-     * @throws SQLException
+     * @param st Statement
+     * @return id
+     */
+    protected int getResult(final PreparedStatement st) throws SQLException {
+        int id = 0;
+        try (ResultSet rs = st.getGeneratedKeys()) {
+            //id = rs.next() ? rs.getInt(1) : 0;
+            //if (rs.next()) {
+            //    id = rs.getInt(1);
+            //}
+            boolean b = rs.next();
+            id = rs.getInt(1);
+        } catch (SQLException e) {
+            LOG.info("Ошибка");
+            LOG.error(e.getMessage(), e);
+            throw new SQLException();
+        }
+        return id;
+    }
+
+    /**
+     * @param id   id.
+     * @param item item
+     * @return idAdd aded id
      */
     @Override
     public String addInID(final String id, final Item item) throws SQLException {
@@ -116,9 +141,10 @@ public class SqlTracker implements Store {
     /**
      * delete.
      *
-     * @param id
-     * @return
+     * @param id id
+     * @return True if deleted
      */
+    @SuppressFBWarnings("SQL_INJECTION_JDBC")
     @Override
     public boolean delete(final String id, final Table table) {
         String tableQuery = String.format(
@@ -131,6 +157,23 @@ public class SqlTracker implements Store {
             LOG.error(e.getMessage(), e);
         }
         return false;
+    }
+
+    /**
+     * truncate Table.
+     *
+     * @param table table
+     */
+    public void truncate(final Table table) {
+        String tableQuery = String.format(
+                "TRUNCATE TABLE %s CASCADE",
+                table.getName()
+        );
+        try (PreparedStatement st = cn.prepareStatement(tableQuery)) {
+            st.executeUpdate();
+        } catch (SQLException e) {
+            LOG.error(e.getMessage(), e);
+        }
     }
 
     /**
@@ -160,7 +203,7 @@ public class SqlTracker implements Store {
      * @return List<Item>
      */
     @Override
-    public List<Item> findByName(final String key, final Table table) throws SQLException {
+    public List<Item> findByName(final String key, final Table table) {
         String tableQuery = String.format("SELECT * FROM %s  WHERE name = '%s'",
                 table.getName(), key);
         return select(tableQuery, table);
@@ -169,7 +212,7 @@ public class SqlTracker implements Store {
     /**
      * findAll.
      *
-     * @return
+     * @return list of all Items
      */
     @Override
     public List<Item> findAll(final Table table) {
@@ -177,6 +220,7 @@ public class SqlTracker implements Store {
         return select(tableQuery, table);
     }
 
+    @SuppressFBWarnings({"SQL_INJECTION_JDBC", "RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"})
     private List<Item> select(final String tableQuery, final Table table) {
         List<Item> list = new ArrayList<>();
         try (Statement statement = cn.createStatement();
@@ -193,9 +237,10 @@ public class SqlTracker implements Store {
     /**
      * findById.
      *
-     * @param id
-     * @return
+     * @param id id
+     * @return item finded item
      */
+    @SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE", "SQL_INJECTION_JDBC"})
     @Override
     public Item findById(final String id, final Table table) {
         String tableQuery = String.format("SELECT * FROM %s  WHERE id = %s",
@@ -237,4 +282,29 @@ public class SqlTracker implements Store {
             cn.close();
         }
     }
+
+    /**
+     * для большего покрытия теста.
+     *
+     * @param cn Connection
+     */
+    public final void setCn(final Connection cn) {
+        this.cn = cn;
+    }
 }
+
+//
+//@SuppressWarnings("checkstyle:HideUtilityClassConstructor")
+//class CollaboratorWithStaticMethods {
+//    public static String firstMethod(final String name) {
+//        return "Hello " + name + " !";
+//    }
+//
+//    public static String secondMethod() {
+//        return "Hello no one!";
+//    }
+//
+//    public static String thirdMethod() {
+//        return "Hello no one again!";
+//    }
+//}

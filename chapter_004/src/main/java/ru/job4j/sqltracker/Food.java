@@ -1,5 +1,8 @@
 package ru.job4j.sqltracker;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
@@ -51,11 +54,12 @@ class Table {
 
 
 class Item {
+    private static final Logger LOG = LoggerFactory.getLogger(Item.class);
     private Table table;
     private String name;
     private int typeid;
     private String expireddate = "";
-    private BigDecimal price = new BigDecimal("0");
+    private BigDecimal price = BigDecimal.ZERO;
 
     Item(final Table table, final String name, final int typeid,
          final String expireddate, final BigDecimal price) {
@@ -91,10 +95,6 @@ class Item {
         return price;
     }
 
-    public String[] getArrayItem() {
-        return new String[]{name, String.valueOf(typeid), expireddate, price.toString()};
-    }
-
     @Override
     public String toString() {
         String columns = table.getColumn().replace("_", "");
@@ -107,7 +107,7 @@ class Item {
                 builder.append(n).append("=").append(field.get(this)).append(" ");
             }
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage(), e);
         }
         return builder.append("}").append(System.lineSeparator()).toString();
     }
