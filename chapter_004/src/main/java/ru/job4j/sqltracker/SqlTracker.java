@@ -22,7 +22,6 @@ public class SqlTracker implements Store {
      *
      * @param st   the st
      * @param item the item
-     * @return the prepared statement
      * @throws SQLException the sql exception
      */
     public void prodStatement(final PreparedStatement st, final Item item)
@@ -91,7 +90,6 @@ public class SqlTracker implements Store {
             id = rs.next() ? rs.getInt(1) : 0;
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e);
-            e.printStackTrace();
         }
         return String.valueOf(id);
     }
@@ -131,9 +129,7 @@ public class SqlTracker implements Store {
             return st.executeUpdate() > 0;
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e);
-            e.printStackTrace();
         }
-        //DELETE FROM product WHERE id = 41;
         return false;
     }
 
@@ -149,7 +145,6 @@ public class SqlTracker implements Store {
         if (delete(id, item.getTable())) {
             idStr = "id ,";
             idArg = id.concat(" ,");
-            //boolean res = add(item);
             add(item);
             idStr = "";
             idArg = "";
@@ -191,7 +186,6 @@ public class SqlTracker implements Store {
             }
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e);
-            e.printStackTrace();
         }
         return list;
     }
@@ -214,7 +208,6 @@ public class SqlTracker implements Store {
             }
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e);
-            e.printStackTrace();
         }
         return item;
     }

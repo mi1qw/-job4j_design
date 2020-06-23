@@ -1,5 +1,7 @@
 package ru.job4j.sqltracker;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hamcrest.Matchers;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -19,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 //Sorts by method name
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SqlTrackerTest {
+    private static final Logger LOGGER = LogManager.getLogger(SqlTrackerTest.class.getName());
     private static SqlTracker sql;
     private static Table product;
     private static Table type;
@@ -29,7 +32,6 @@ public class SqlTrackerTest {
     public static void setUpDBase() throws SQLException {
         sql = new SqlTracker();
         sql.init();
-        Food food = new Food();
         product = new Table(
                 "product",
                 "name, type_id, expired_date, price",
