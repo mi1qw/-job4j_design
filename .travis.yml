@@ -8,6 +8,11 @@ dist: xenial
 os:
   - linux
 
+services:
+  - postgresql
+before_install:
+  - psql -c 'create database product;' -U postgres
+
 addons:
   sonarcloud:
     organization: "mi1qw"

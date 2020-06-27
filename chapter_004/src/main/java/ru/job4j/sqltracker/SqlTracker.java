@@ -6,20 +6,86 @@ import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.sql.Statement;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+@SuppressFBWarnings({"SQL_INJECTION_JDBC", "RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"})
 public class SqlTracker implements Store {
+    public static final String LN = System.lineSeparator();
     private static final Logger LOG = LoggerFactory.getLogger(SqlTracker.class);
     private Connection cn;
     private String idStr = "";
     private String idArg = "";
 
     /**
-     * Prod statement prepared statement.
+     * Set all tables.
+     * Если имеются таблицы, вывести их содержимое
+     *
+     * @return the boolean
+     */
+    @Override
+    public boolean isAnyTable() {
+        boolean res = false;
+        List<String> list = new ArrayList<>();
+        try (ResultSet mrs = cn.getMetaData().getTables(null, null,
+                null, new String[]{"TABLE"})) {
+            while (mrs.next()) {
+                list.add(mrs.getString(3));
+            }
+            if (!list.isEmpty()) {
+                res = true;
+                displayTables(list);
+            }
+        } catch (SQLException e) {
+            LOG.error(e.getMessage(), e);
+        }
+        return res;
+    }
+
+    /**
+     * Display tables by name.
+     *
+     * @param list the List<String> of tables
+     */
+    @Override
+    public void displayTables(final List<String> list) {
+        for (String name : list) {
+            doQuery(String.format("SELECT * FROM %s", name), name);
+        }
+    }
+
+    /**
+     * Выполнить как-то запрос/команду
+     *
+     * @param query query + строка для вывода в лог
+     */
+    @Override
+    public void doQuery(final String... query) {
+        try (Statement st = cn.createStatement()) {
+            boolean isResult = st.execute(query[0]);
+            if (isResult) {
+                StringBuilder sb = new StringBuilder();
+                try (ResultSet resalt = st.getResultSet()) {
+                    while (resalt.next()) {
+                        for (int n = 1; n <= resalt.getMetaData().getColumnCount(); ++n) {
+                            sb.append(resalt.getObject(n));
+                            sb.append(" ");
+                        }
+                        sb.append(LN);
+                    }
+                }
+                String str = query.length > 1 ? query[1].concat(LN) : "";
+                LOG.info("Query {}{}", str, sb);
+            }
+        } catch (SQLException e) {
+            LOG.error(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Prod prepared statement.
      *
      * @param st   the st
      * @param item the item
@@ -34,7 +100,7 @@ public class SqlTracker implements Store {
     }
 
     /**
-     * Type statement prepared statement.
+     * Type prepared statement.
      *
      * @param st   the st
      * @param item the item
@@ -62,8 +128,13 @@ public class SqlTracker implements Store {
                     config.getProperty("username"),
                     config.getProperty("password")
             );
+            StringBuilder sb = new StringBuilder();
+            sb.append("DataBase ").append(cn.getCatalog()).append(LN).
+                    append("URL ").append(cn.getMetaData().getURL()).append(LN).
+                    append("UserName ").append(cn.getMetaData().getUserName()).append(LN);
+
+            LOG.info("Connected to {}", sb);
         } catch (Exception e) {
-            System.out.println("qqqqqqqqqqqqqq111111111111111");
             throw new IllegalStateException(e);
         }
     }
@@ -74,12 +145,10 @@ public class SqlTracker implements Store {
      *
      * @param item item
      * @return String id
-     * @throws SQLException для теста
      */
-    @SuppressFBWarnings({"SQL_INJECTION_JDBC", "RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"})
     @Override
-    public String add(final Item item) throws SQLException {
-        int id;
+    public String add(final Item item) {
+        int id = 0;
         Table table = item.getTable();
         String tableQuery = String.format("INSERT INTO %s (%s) VALUES(%s)",
                 table.getName(),
@@ -92,41 +161,37 @@ public class SqlTracker implements Store {
             st.executeUpdate();
             id = getResult(st);
         } catch (SQLException e) {
-            LOG.info("Ошибка");
             LOG.error(e.getMessage(), e);
-            throw new SQLException();
         }
         return String.valueOf(id);
     }
 
     /**
+     * Gets result.
+     *
      * @param st Statement
-     * @return id
+     * @return id result
      */
     protected int getResult(final PreparedStatement st) throws SQLException {
         int id = 0;
         try (ResultSet rs = st.getGeneratedKeys()) {
-            //id = rs.next() ? rs.getInt(1) : 0;
-            //if (rs.next()) {
-            //    id = rs.getInt(1);
-            //}
-            boolean b = rs.next();
+            rs.next();
             id = rs.getInt(1);
         } catch (SQLException e) {
-            LOG.info("Ошибка");
             LOG.error(e.getMessage(), e);
-            throw new SQLException();
         }
         return id;
     }
 
     /**
+     * Добавить строку в id указанной таблицы.
+     *
      * @param id   id.
      * @param item item
      * @return idAdd aded id
      */
     @Override
-    public String addInID(final String id, final Item item) throws SQLException {
+    public String addInID(final String id, final Item item) {
         String idAdd = "-1";
         if (findById(id, item.getTable()) == null) {
             idStr = "id ,";
@@ -160,7 +225,7 @@ public class SqlTracker implements Store {
     }
 
     /**
-     * truncate Table.
+     * truncate указанную Table.
      *
      * @param table table
      */
@@ -177,7 +242,7 @@ public class SqlTracker implements Store {
     }
 
     /**
-     * replace.
+     * replace по id в указанной таблице.
      *
      * @param id   id
      * @param item item
@@ -197,7 +262,7 @@ public class SqlTracker implements Store {
     }
 
     /**
-     * findByName.
+     * Поиск по столбцу name в заданной таблице.
      *
      * @param key скорее всего name ключевой колонки
      * @return List<Item>
@@ -235,10 +300,12 @@ public class SqlTracker implements Store {
     }
 
     /**
-     * findById.
+     * Find by id item.
+     * поиск записи по id в указанной таблице
      *
-     * @param id id
-     * @return item finded item
+     * @param id    the id
+     * @param table the table таблица поиска
+     * @return the item
      */
     @SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE", "SQL_INJECTION_JDBC"})
     @Override
@@ -257,6 +324,19 @@ public class SqlTracker implements Store {
         return item;
     }
 
+    /**
+     * New item item.
+     * Одна строка с id из таблицы. По условию задания, строки не дублируются.
+     * Создаёт данные item в зависимости от указанной table.
+     * Для простоты только два варианта "строк" таблиц.
+     * Таблица product и type. Если таблиц больше, нужна будет дополнительная
+     * коллекция map, заодно со ссылками на конструкторы этих таблиц
+     *
+     * @param rs    the rs
+     * @param table the table
+     * @return the item
+     * @throws SQLException the sql exception
+     */
     private Item newItem(final ResultSet rs, final Table table) throws SQLException {
         int columns = rs.getMetaData().getColumnCount();
         if (columns < 3) {
@@ -282,29 +362,4 @@ public class SqlTracker implements Store {
             cn.close();
         }
     }
-
-    /**
-     * для большего покрытия теста.
-     *
-     * @param cn Connection
-     */
-    public final void setCn(final Connection cn) {
-        this.cn = cn;
-    }
 }
-
-//
-//@SuppressWarnings("checkstyle:HideUtilityClassConstructor")
-//class CollaboratorWithStaticMethods {
-//    public static String firstMethod(final String name) {
-//        return "Hello " + name + " !";
-//    }
-//
-//    public static String secondMethod() {
-//        return "Hello no one!";
-//    }
-//
-//    public static String thirdMethod() {
-//        return "Hello no one again!";
-//    }
-//}

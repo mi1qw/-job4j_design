@@ -27,8 +27,8 @@ import static org.mockito.Mockito.mock;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SqlTrackerTest {
     private static final Logger LOGGER = LogManager.getLogger(SqlTrackerTest.class);
-    private static final String KOROVKA = "Мороженое Коровка";
-    private static final String DESERT = "Десерт";
+    private static final String KOROVKA = "Ice Cream Cow";
+    private static final String DESERT = "Dessert";
     private static SqlTracker sql;
     private static Table product;
     private static Table type;
@@ -38,14 +38,22 @@ public class SqlTrackerTest {
 
     @BeforeClass
     public static void setUpDBase() throws SQLException {
+        LOGGER.info("setUpDBase ");
         sql = new SqlTracker();
-        sql.setCn(null);
+        //для зелёной ветки теста if в методе close()
         try {
             sql.close();
         } catch (Exception e) {
             LOGGER.info(e.getMessage(), e);
         }
         sql.init();
+        //Создать две талицы если их ещё нет в базе
+        if (!sql.isAnyTable()) {
+            sql.doQuery("CREATE TABLE type(\"id\" serial NOT NULL PRIMARY KEY, \"name\" VARCHAR(50))");
+            sql.doQuery("CREATE TABLE product (\"id\" serial NOT NULL PRIMARY KEY,\"name\" VARCHAR ( 40 ) NOT NULL,"
+                    + "\"type_id\" INTEGER references type(id),\"expired_date\" TIMESTAMP, \"price\" NUMERIC ( 6, 4 ))");
+        }
+
         product = new Table(
                 "product",
                 "name, type_id, expired_date, price",
@@ -56,52 +64,50 @@ public class SqlTrackerTest {
                 "name",
                 sql::typeStatement
         );
-        //не существующая таблица
+        //несуществующая таблица для теста
         type1 = new Table(
                 "type1",
                 "name",
                 sql::typeStatement
         );
 
-        Item item = new Item(type, "Десерт Тестовый");
+        Item item = new Item(type, "Dessert Test");
         sql.addInID("1", item);
-        item = new Item(
-                product,
-                "Мороженое Тестовое",
+        sql.doQuery("SELECT SETVAL('type_id_seq', 1)");
+        item = new Item(product,
+                "Ice Cream Test",
                 1,
                 "2020-6-28 00:00:00",
                 new BigDecimal("10.52")
         );
         sql.addInID("1", item);
+        sql.doQuery("SELECT SETVAL('product_id_seq', 1)");
     }
 
-    //@Before
-    //public void setUp() {
-    //    sql = new SqlTracker();
-    //    sql.init();
-    //}
-
-    //@After
     @AfterClass
-    public static void end() throws Exception {
-        sql.truncate(type);
+    public static void end() {
+        LOGGER.info("AfterClass ");
+        sql.isAnyTable();
         try {
             sql.close();
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
-        sql.close();
     }
 
     @Test
-    public void a0findByName() throws SQLException {
-        List<Item> list = sql.findByName("Мороженое Тестовое", product);
-        assertThat(list.get(0).getName(), is("Мороженое Тестовое"));
+    public void a0findByName() {
+        LOGGER.info("a0findByName ");
+        sql.isAnyTable();
+        List<Item> list = sql.findByName("Ice Cream Test", product);
+        assertThat(list.get(0).getName(), is("Ice Cream Test"));
     }
 
     @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     @Test
     public void a1addItemProduct() throws SQLException {
+        LOGGER.info("a1addItemProduct ");
+        sql.isAnyTable();
         Item item = new Item(
                 product,
                 KOROVKA,
@@ -117,6 +123,8 @@ public class SqlTrackerTest {
     @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     @Test
     public void a2addItemType() throws SQLException {
+        LOGGER.info("a2addItemType ");
+        sql.isAnyTable();
         Item item = new Item(type, DESERT);
         idType = sql.add(item);
         List<Item> list = sql.findByName(DESERT, type);
@@ -125,6 +133,8 @@ public class SqlTrackerTest {
 
     @Test
     public void a3findById() {
+        LOGGER.info("a3findById ");
+        sql.isAnyTable();
         Item item = sql.findById(idProduct, product);
         assertThat(item.getName(), is(KOROVKA));
         item = sql.findById(idType, type);
@@ -133,35 +143,41 @@ public class SqlTrackerTest {
 
     @Test
     public void a4replaceProduct() throws SQLException {
+        LOGGER.info("a4replaceProduct ");
+        sql.isAnyTable();
         Item item = sql.findById(idProduct, product);
         assertThat(item.getName(), is(KOROVKA));
         item = new Item(
                 product,
-                "Мороженое Каштан",
+                "Ice Cream Kashtan",
                 1,
                 "2020-6-28 00:00:00",
                 new BigDecimal("15.25")
         );
         sql.replace(idProduct, item);
         item = sql.findById(idProduct, product);
-        assertThat(item.getName(), is("Мороженое Каштан"));
+        assertThat(item.getName(), is("Ice Cream Kashtan"));
     }
 
     @Test
     public void a5replaceType() throws SQLException {
+        LOGGER.info("a5replaceType ");
+        sql.isAnyTable();
         Item item = sql.findById(idType, type);
         assertThat(item.getName(), is(DESERT));
         item = new Item(
                 type,
-                "Десерт Вкусный"
+                "Dessert Delicious"
         );
         sql.replace(idType, item);
         item = sql.findById(idType, type);
-        assertThat(item.getName(), is("Десерт Вкусный"));
+        assertThat(item.getName(), is("Dessert Delicious"));
     }
 
     @Test
     public void a6findAllProdukt() throws SQLException {
+        LOGGER.info("a6findAllProdukt ");
+        sql.isAnyTable();
         List<Item> list = sql.findAll(product);
         LOGGER.info(list);
         BigDecimal sum = BigDecimal.ZERO;
@@ -174,23 +190,29 @@ public class SqlTrackerTest {
 
     @Test
     public void a7findAllType() throws SQLException {
+        LOGGER.info("a7findAllType ");
+        sql.isAnyTable();
         List<Item> list = sql.findAll(type);
         LOGGER.info(list);
         String name = "";
         for (Item n : list) {
             name = name.concat(n.getName());
         }
-        assertEquals("Десерт ТестовыйДесерт Вкусный", name);
+        assertEquals("Dessert TestDessert Delicious", name);
     }
 
     @Test
     public void a8addInIDtoExistingID() throws SQLException {
+        LOGGER.info("a8addInIDtoExistingID ");
+        sql.isAnyTable();
         assertEquals("-1", sql.addInID("1",
                 new Item(type, "zzz")));
     }
 
     @Test
     public void a9delete() {
+        LOGGER.info("a9delete ");
+        sql.isAnyTable();
         assertTrue(sql.delete(idProduct, product));
         assertTrue(sql.delete(idType, type));
         assertTrue(sql.delete("1", product));
@@ -202,81 +224,75 @@ public class SqlTrackerTest {
 
     @Test
     public void replaceEmptyRow() throws SQLException {
+        LOGGER.info("replaceEmptyRow ");
+        sql.isAnyTable();
         assertFalse(sql.replace("999", new Item(type, "aaa")));
     }
 
-    @Test(expected = SQLException.class)
-    public void z1whenException() throws SQLException {
+    @Test
+    public void z1whenAddGetResultException() throws SQLException {
+        LOGGER.info("z1whenAddGetResultException ");
+        sql.isAnyTable();
         SqlTracker spy = Mockito.spy(sql);
         doThrow(new SQLException()).when(spy).getResult(any());
-        spy.add(new Item(type, "zzz"));
+        spy.add(new Item(type, "zxc"));
+        assertTrue(true);
     }
 
-    @Test(expected = SQLException.class)
-    public void z1() throws SQLException {
+    @Test
+    public void z1whenGetResultException() throws SQLException {
+        LOGGER.info("z1whenGetResultException ");
+        sql.isAnyTable();
         PreparedStatement prep = mock(PreparedStatement.class);
         doThrow(new SQLException()).when(prep).getGeneratedKeys();
         sql.getResult(prep);
+        assertTrue(true);
     }
 
     @Test
     public void deleteNonExistingTable() {
+        LOGGER.info("deleteNonExistingTable ");
+        sql.isAnyTable();
         sql.delete("10", type1);
         assertTrue(true);
     }
 
     @Test
-    public void truncateNonExistingTable() {
-        sql.truncate(type1);
-        assertTrue(true);
-    }
-
-    @Test
     public void findAllNonExistingTable() {
+        LOGGER.info("findAllNonExistingTable ");
+        sql.isAnyTable();
         sql.findAll(type1);
         assertTrue(true);
     }
 
     @Test
     public void findByIdNonExistingTable() {
+        LOGGER.info("findByIdNonExistingTable ");
+        sql.isAnyTable();
         sql.findById("1", type1);
         assertTrue(true);
     }
 
     @Test
     public void z98truncateTheTable() {
+        LOGGER.info("z98truncateTheTable ");
+        sql.isAnyTable();
         sql.truncate(type);
         assertTrue(true);
     }
 
-    //@PrepareForTest(DriverManager.class)
-    //@Test(expected = Exception.class)
-    //public void init() throws IOException, ClassNotFoundException, SQLException {
-    //    SqlTracker spy = Mockito.spy(sql);
-    //    //doThrow(new SQLException()).when(spy).
-    //    //DriverManager conn = mock(DriverManager.class);
-    //    //Properties conn = mock(Properties.class);
-    //    //doThrow(new Exception()).when(spy).init();
-    //    //InputStream conn = mock(InputStream.class);
-    //    //doThrow(new Exception()).when(conn).available();
-    //    //when(conn.available()).thenThrow(new SQLException());
-    //
-    //    //Class conn = mock(Class.class);
-    //    //doThrow(new Exception()).when(conn).forName(anyString());
-    //
-    //    Connection connection = mock(Connection.class);
-    //
-    //    mockStatic(DriverManager.class);
-    //
-    //    //PowerMockito.when(DriverManager.getConnection(
-    //    //        anyString(), anyString(), anyString())).
-    //    //        //thenThrow(new Exception());
-    //    //        thenReturn(any(Connection.class));
-    //
-    //    PowerMockito.doThrow(new Exception()).when(DriverManager.class);
-    //
-    //    //doThrow(new Exception()).
-    //    spy.init();
-    //}
-}
+    @Test
+    public void truncateNonExistingTable() {
+        LOGGER.info("truncateNonExistingTable ");
+        sql.isAnyTable();
+        sql.truncate(type1);
+        assertTrue(true);
+    }
 
+    @Test
+    public void z11doQuery() {
+        sql.doQuery("set lc_monetary to 'C' ");
+        sql.doQuery("SELECT * FROM qqqq");
+        assertTrue(true);
+    }
+}
