@@ -24,7 +24,7 @@ import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.*;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-@PowerMockIgnore({"javax.net.ssl.*"})
+//@PowerMockIgnore({"javax.net.ssl.*"})
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({SqlTracker.class})
 public class ExceptionTest {
