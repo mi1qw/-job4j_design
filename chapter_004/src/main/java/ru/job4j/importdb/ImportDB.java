@@ -14,16 +14,33 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
 public class ImportDB {
     private static final Logger LOG = LogManager.getLogger(ImportDB.class);
-    private final Properties cfg;
-    private final String dump;
+    private final String dumpDb = null;
+    private String dump = null;
+    private Connection cnt = null;
+    private String fileDb = null;
 
-    public ImportDB(final Properties cfg, final String dump) {
-        this.cfg = cfg;
+    public ImportDB(final String fileDb, final String dump) {
+        this.fileDb = fileDb;
         this.dump = dump;
+    }
+
+    public static void main(final String[] args) throws Exception {
+        String fileDb = Objects.requireNonNull(ImportDB.class.getClassLoader().
+                getResource("app_ImportDB.properties")).getFile();
+        String dump = Objects.requireNonNull(ImportDB.class.getClassLoader().
+                getResource("dump.txt")).getFile();
+        new ImportDB(fileDb, dump).go();
+    }
+
+    private void go() throws IOException, SQLException, ClassNotFoundException {
+        cnt = init();
+        save(load());
+        cnt.close();
     }
 
     /**
@@ -44,6 +61,24 @@ public class ImportDB {
         return users;
     }
 
+    //private Connection init(final String fileDb) {
+    private Connection init() {
+        Connection cnt = null;
+        try (FileInputStream in = new FileInputStream(fileDb)) {
+            Properties cfg = new Properties();
+            cfg.load(in);
+            Class.forName(cfg.getProperty("jdbc.driver"));
+            cnt = DriverManager.getConnection(
+                    cfg.getProperty("jdbc.url"),
+                    cfg.getProperty("jdbc.username"),
+                    cfg.getProperty("jdbc.password")
+            );
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+        return cnt;
+    }
+
     /**
      * Save.
      *
@@ -52,40 +87,18 @@ public class ImportDB {
      * @throws SQLException           the sql exception
      */
     public void save(final List<User> users) throws ClassNotFoundException, SQLException {
-        Class.forName(cfg.getProperty("jdbc.driver"));
-        try (Connection cnt = DriverManager.getConnection(
-                cfg.getProperty("jdbc.url"),
-                cfg.getProperty("jdbc.username"),
-                cfg.getProperty("jdbc.password")
-        )) {
-            cnt.setAutoCommit(false);
-            try (PreparedStatement ps = cnt.prepareStatement(
-                    "insert INTO users(name, email) VALUES(?, ?)")) {
-                for (User user : users) {
-                    ps.setString(1, user.name);
-                    ps.setString(2, user.email);
-                    ps.addBatch();
-                }
-                ps.executeBatch();
+        cnt.setAutoCommit(false);
+        try (PreparedStatement ps = cnt.prepareStatement(
+                "insert INTO users(name, email) VALUES(?, ?)")) {
+            for (User user : users) {
+                ps.setString(1, user.name);
+                ps.setString(2, user.email);
+                ps.addBatch();
             }
-            cnt.commit();
-            cnt.setAutoCommit(true);
+            ps.executeBatch();
         }
-    }
-
-    public static void main(final String[] args) {
-        String fileDb = ImportDB.class.getClassLoader().
-                getResource("app_ImportDB.properties").getFile();
-        String dumpDb = ImportDB.class.getClassLoader().
-                getResource("dump.txt").getFile();
-        Properties cfg = new Properties();
-        try (FileInputStream in = new FileInputStream(fileDb)) {
-            cfg.load(in);
-            ImportDB db = new ImportDB(cfg, dumpDb);
-            db.save(db.load());
-        } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-        }
+        cnt.commit();
+        cnt.setAutoCommit(true);
     }
 
     private static class User {

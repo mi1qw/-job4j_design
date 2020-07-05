@@ -8,8 +8,22 @@
         <version>3.6.3</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>chapter_004</artifactId>
+    <dependencies>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>3.3.3</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <db.url>jdbc:postgresql://127.0.0.1:5432/spammer</db.url>
+        <db.username>postgres</db.username>
+        <db.password>Password12!</db.password>
+        <db.driver>org.postgresql.Driver</db.driver>
+    </properties>
     <build>
         <plugins>
             <plugin>
