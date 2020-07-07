@@ -1,8 +1,6 @@
 package ru.job4j.importdb;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -18,8 +16,6 @@ import java.util.Objects;
 import java.util.Properties;
 
 public class ImportDB {
-    private static final Logger LOG = LogManager.getLogger(ImportDB.class);
-    private final String dumpDb = null;
     private String dump = null;
     private Connection cnt = null;
     private String fileDb = null;
@@ -29,7 +25,7 @@ public class ImportDB {
         this.dump = dump;
     }
 
-    public static void main(final String[] args) throws Exception {
+    public static void main(final String[] args) throws SQLException, IOException, ClassNotFoundException {
         String fileDb = Objects.requireNonNull(ImportDB.class.getClassLoader().
                 getResource("app_ImportDB.properties")).getFile();
         String dump = Objects.requireNonNull(ImportDB.class.getClassLoader().
@@ -61,14 +57,13 @@ public class ImportDB {
         return users;
     }
 
-    //private Connection init(final String fileDb) {
     private Connection init() {
-        Connection cnt = null;
+        Connection connection = null;
         try (FileInputStream in = new FileInputStream(fileDb)) {
             Properties cfg = new Properties();
             cfg.load(in);
             Class.forName(cfg.getProperty("jdbc.driver"));
-            cnt = DriverManager.getConnection(
+            connection = DriverManager.getConnection(
                     cfg.getProperty("jdbc.url"),
                     cfg.getProperty("jdbc.username"),
                     cfg.getProperty("jdbc.password")
@@ -76,7 +71,7 @@ public class ImportDB {
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
-        return cnt;
+        return connection;
     }
 
     /**
@@ -89,7 +84,7 @@ public class ImportDB {
     public void save(final List<User> users) throws ClassNotFoundException, SQLException {
         cnt.setAutoCommit(false);
         try (PreparedStatement ps = cnt.prepareStatement(
-                "insert INTO users(name, email) VALUES(?, ?)")) {
+                "insert INTO \"users\"(\"name\", \"email\") VALUES(?, ?)")) {
             for (User user : users) {
                 ps.setString(1, user.name);
                 ps.setString(2, user.email);
