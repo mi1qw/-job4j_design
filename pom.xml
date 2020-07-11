@@ -169,14 +169,32 @@
 
     <profiles>
         <profile>
-            <id>travis</id>
+            <id>spammer</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
+                <db.url>jdbc:postgresql://127.0.0.1:5432/spammer</db.url>
+                <db.username>postgres</db.username>
+                <db.password>Password12!</db.password>
+                <db.driver>org.postgresql.Driver</db.driver>
+            </properties>
+        </profile>
+        <profile>
+            <id>production</id>
+            <properties>
+                <db.url>jdbc:postgresql://127.0.0.1:5432/product</db.url>
+                <db.username>postgres</db.username>
+                <db.password>Password12!</db.password>
+                <db.driver>org.postgresql.Driver</db.driver>
+            </properties>
+        </profile>
+        <profile>
+            <id>travis</id>
+            <properties>
                 <db.url>jdbc:postgresql://localhost/product</db.url>
                 <db.username>postgres</db.username>
-                <db.password></db.password>
+                <db.password>Password12!</db.password>
                 <db.driver>org.postgresql.Driver</db.driver>
             </properties>
         </profile>
@@ -187,7 +205,6 @@
             </activation>
             <build>
                 <plugins>
-                    <!--нужен ли checkstyle?-->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-checkstyle-plugin</artifactId>
@@ -235,13 +252,9 @@
                         <executions>
                             <execution>
                                 <id>jacoco-instrument</id>
-                                <!--                                <phase>test</phase>-->
                                 <goals>
                                     <goal>instrument</goal>
                                 </goals>
-                                <!--                                <configuration>-->
-                                <!--                                    <skip>true</skip>-->
-                                <!--                                </configuration>-->
                             </execution>
                             <execution>
                                 <id>default-restore-instrumented-classes</id>
@@ -255,19 +268,6 @@
                                     <goal>report</goal>
                                 </goals>
                             </execution>
-                            <!--                            <execution>-->
-                            <!--                                <id>prepare-agent</id>-->
-                            <!--                                <goals>-->
-                            <!--                                    <goal>prepare-agent</goal>-->
-                            <!--                                </goals>-->
-                            <!--                            </execution>-->
-                            <!--                            <execution>-->
-                            <!--                                <id>report</id>-->
-                            <!--                                <phase>test</phase>-->
-                            <!--                                <goals>-->
-                            <!--                                    <goal>report</goal>-->
-                            <!--                                </goals>-->
-                            <!--                            </execution>-->
                         </executions>
                     </plugin>
                     <plugin>
