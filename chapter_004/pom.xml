@@ -9,14 +9,14 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chapter_004</artifactId>
-    <dependencies>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>3.3.3</version>
-            <scope>compile</scope>
-        </dependency>
-    </dependencies>
+<!--    <dependencies>-->
+<!--        <dependency>-->
+<!--            <groupId>org.mockito</groupId>-->
+<!--            <artifactId>mockito-core</artifactId>-->
+<!--            <version>3.3.3</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--    </dependencies>-->
 
     <properties>
         <db.url>jdbc:postgresql://127.0.0.1:5432/spammer</db.url>
