@@ -4,51 +4,81 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
 
-public class Product implements Store {
-    private Integer id;
-    private String name;
-    private Type typeid;
-    private Timestamp expireddate;
-    private BigDecimal price;
+public class Product<T extends Product.Item> implements StorePT<T> {
+    //private Integer id;
+    //private String name;
+    //private Type typeid;
+    //private Timestamp expireddate;
+    //private BigDecimal price;
+    private SqlTracker2 sql;
+    public static final String PRODUCT = "product";
+    //
+    //public Product(final Integer id, final String name, final Type typeid, final Timestamp expireddate,
+    //               final BigDecimal price) {
+    //    this.id = id;
+    //    this.name = name;
+    //    this.typeid = typeid;
+    //    this.expireddate = expireddate;
+    //    this.price = price;
+    //
+    //}
 
-    private
-
-    public Product(final Integer id, final String name, final Type typeid, final Timestamp expireddate,
-                   final BigDecimal price) {
-        this.id = id;
-        this.name = name;
-        this.typeid = typeid;
-        this.expireddate = expireddate;
-        this.price = price;
-    }
-
+    /**
+     * init.
+     */
     @Override
     public void init() {
-
+        sql = new SqlTracker2(PRODUCT);
+        sql.init();
     }
 
+    /**
+     * close.
+     *
+     * @throws Exception
+     */
     @Override
-    public void close() {
-
+    public void close() throws Exception {
+        sql.close();
     }
 
+    /**
+     * add Item.
+     *
+     * @param item
+     * @return
+     */
     @Override
-    public String add(final Item item) {
+    public String add(final T item) {
+        //return sql.add(item);
         return null;
     }
 
+    /**
+     * delete Item with id.
+     *
+     * @param id
+     * @return
+     */
     @Override
     public boolean delete(final String id) {
-        return false;
+        return sql.delete(id);
     }
 
+    /**
+     * @return Item.
+     */
     @Override
-    public List<Item> findByName(final String key) {
+    public List<T> findByName(final String key) {
+        //return sql.findByName(key);
         return null;
     }
 
+    /**
+     * @return Item.
+     */
     @Override
-    public List<Item> findAll() {
+    public List<T> findAll() {
         return null;
     }
 
@@ -60,7 +90,7 @@ public class Product implements Store {
      * @return true если успешно
      */
     @Override
-    public boolean replace(final String id, final Item item) {
+    public boolean replace(final String id, final T item) {
         return false;
     }
 
@@ -72,29 +102,18 @@ public class Product implements Store {
      * @return the item
      */
     @Override
-    public Item findById(final String id) {
+    public T findById(final String id) {
         return null;
-    }
-
-    /**
-     * Set all tables.
-     * Если имеются таблицы, вывести их содержимое
-     *
-     * @return the boolean
-     */
-    @Override
-    public boolean isAnyTable() {
-        return false;
     }
 
     public static class Item {
         private Integer id;
         private String name;
-        private Integer typeid;
+        private Type.Item typeid;
         private Timestamp expireddate;
         private BigDecimal price = BigDecimal.ZERO;
 
-        public Item(final Integer id, final String name, final Integer typeid,
+        public Item(final Integer id, final String name, final Type.Item typeid,
                     final Timestamp expireddate, final BigDecimal price) {
             this.id = id;
             this.name = name;
@@ -119,18 +138,21 @@ public class Product implements Store {
 }
 
 
-public class Type implements Store {
-    private Integer id;
-    private String name;
-
-    public Type(final Integer id, final String name) {
-        this.id = id;
-        this.name = name;
-    }
+class Type<T extends Type.Item> implements StorePT<T> {
+    private SqlTracker2 sql;
+    public static final String TYPE = "type";
+    //private Integer id;
+    //private String name;
+    //
+    //Type(final Integer id, final String name) {
+    //    this.id = id;
+    //    this.name = name;
+    //}
 
     @Override
     public void init() {
-
+        sql = new SqlTracker2(TYPE);
+        sql.init();
     }
 
     @Override
@@ -138,23 +160,42 @@ public class Type implements Store {
 
     }
 
+    /**
+     * add Item.
+     *
+     * @param item
+     * @return
+     */
     @Override
-    public String add(final Item item) {
+    public String add(final T item) {
+        sql.add(item);
         return null;
     }
 
+    /**
+     * delete Item with id.
+     *
+     * @param id
+     * @return
+     */
     @Override
     public boolean delete(final String id) {
         return false;
     }
 
+    /**
+     * @return Item.
+     */
     @Override
-    public List<Item> findByName(final String key) {
+    public List<T> findByName(final String key) {
         return null;
     }
 
+    /**
+     * @return Item.
+     */
     @Override
-    public List<Item> findAll() {
+    public List<T> findAll() {
         return null;
     }
 
@@ -166,7 +207,7 @@ public class Type implements Store {
      * @return true если успешно
      */
     @Override
-    public boolean replace(final String id, final Item item) {
+    public boolean replace(final String id, final T item) {
         return false;
     }
 
@@ -178,26 +219,15 @@ public class Type implements Store {
      * @return the item
      */
     @Override
-    public Item findById(final String id) {
+    public T findById(final String id) {
         return null;
-    }
-
-    /**
-     * Set all tables.
-     * Если имеются таблицы, вывести их содержимое
-     *
-     * @return the boolean
-     */
-    @Override
-    public boolean isAnyTable() {
-        return false;
     }
 
     public static class Item {
         private Integer id;
         private String name;
 
-        public Item(final Integer id, final String name) {
+        Item(final Integer id, final String name) {
             this.id = id;
             this.name = name;
         }
