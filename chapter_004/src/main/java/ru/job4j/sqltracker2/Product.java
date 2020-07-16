@@ -1,27 +1,33 @@
 package ru.job4j.sqltracker2;
 
+//import ru.job4j.sqltracker2.Type.Item;
+
+import ru.job4j.sqltracker2.SqlTracker2.Item;
+
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
 
-public class Product<T extends Product.Item> implements StorePT<T> {
-    //private Integer id;
-    //private String name;
-    //private Type typeid;
-    //private Timestamp expireddate;
-    //private BigDecimal price;
+//import ru.job4j.sqltracker2.Type.Item;
+
+
+public class Product implements Store {
+    private Integer id;
+    private String name;
+    private String typeName;
+    private Timestamp expireddate;
+    private BigDecimal price;
     private SqlTracker2 sql;
     public static final String PRODUCT = "product";
-    //
-    //public Product(final Integer id, final String name, final Type typeid, final Timestamp expireddate,
-    //               final BigDecimal price) {
-    //    this.id = id;
-    //    this.name = name;
-    //    this.typeid = typeid;
-    //    this.expireddate = expireddate;
-    //    this.price = price;
-    //
-    //}
+
+    public Product(final Integer id, final String name, final String typeName, final Timestamp expireddate,
+                   final BigDecimal price) {
+        this.id = id;
+        this.name = name;
+        this.typeName = typeName;
+        this.expireddate = expireddate;
+        this.price = price;
+    }
 
     /**
      * init.
@@ -49,8 +55,9 @@ public class Product<T extends Product.Item> implements StorePT<T> {
      * @return
      */
     @Override
-    public String add(final T item) {
+    public String add(final Item item) {
         //return sql.add(item);
+        Item item
         return null;
     }
 
@@ -69,7 +76,7 @@ public class Product<T extends Product.Item> implements StorePT<T> {
      * @return Item.
      */
     @Override
-    public List<T> findByName(final String key) {
+    public List<Item> findByName(final String key) {
         //return sql.findByName(key);
         return null;
     }
@@ -78,7 +85,7 @@ public class Product<T extends Product.Item> implements StorePT<T> {
      * @return Item.
      */
     @Override
-    public List<T> findAll() {
+    public List<Item> findAll() {
         return null;
     }
 
@@ -90,7 +97,7 @@ public class Product<T extends Product.Item> implements StorePT<T> {
      * @return true если успешно
      */
     @Override
-    public boolean replace(final String id, final T item) {
+    public boolean replace(final String id, final Item item) {
         return false;
     }
 
@@ -102,52 +109,61 @@ public class Product<T extends Product.Item> implements StorePT<T> {
      * @return the item
      */
     @Override
-    public T findById(final String id) {
+    public Item findById(final String id) {
         return null;
     }
 
-    public static class Item {
-        private Integer id;
-        private String name;
-        private Type.Item typeid;
-        private Timestamp expireddate;
-        private BigDecimal price = BigDecimal.ZERO;
+    /**
+     * Выполнить как-то запрос/команду
+     *
+     * @param query query + строка для вывода в лог
+     */
+    @Override
+    public void doQuery(String... query) {
 
-        public Item(final Integer id, final String name, final Type.Item typeid,
-                    final Timestamp expireddate, final BigDecimal price) {
-            this.id = id;
-            this.name = name;
-            this.typeid = typeid;
-            this.expireddate = expireddate;
-            this.price = price;
-        }
+    }
 
-        /**
-         * Returns a string representation of the object.
-         *
-         * @return a string representation of the object.
-         */
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append(id).append(" ").append(name).append(" ").append(typeid).append(" ")
-                    .append(expireddate).append(" ").append(price);
-            return sb.toString();
-        }
+    /**
+     * Display tables by name in List.
+     *
+     * @param list the List<String> of tables
+     */
+    @Override
+    public void displayTables(List<String> list) {
+
+    }
+
+    /**
+     * Set all tables.
+     * Если имеются таблицы, вывести их содержимое
+     *
+     * @return the boolean
+     */
+    @Override
+    public boolean isAnyTable() {
+        return false;
+    }
+
+    /**
+     * truncate Table.
+     */
+    @Override
+    public void truncate() {
+
     }
 }
 
 
-class Type<T extends Type.Item> implements StorePT<T> {
+class Type implements Store {
     private SqlTracker2 sql;
     public static final String TYPE = "type";
-    //private Integer id;
-    //private String name;
-    //
-    //Type(final Integer id, final String name) {
-    //    this.id = id;
-    //    this.name = name;
-    //}
+    private Integer id;
+    private String name;
+
+    Type(final Integer id, final String name) {
+        this.id = id;
+        this.name = name;
+    }
 
     @Override
     public void init() {
@@ -167,8 +183,8 @@ class Type<T extends Type.Item> implements StorePT<T> {
      * @return
      */
     @Override
-    public String add(final T item) {
-        sql.add(item);
+    public String add(final Item item) {
+        sql.add(Item item);
         return null;
     }
 
@@ -187,7 +203,7 @@ class Type<T extends Type.Item> implements StorePT<T> {
      * @return Item.
      */
     @Override
-    public List<T> findByName(final String key) {
+    public List<Item> findByName(final String key) {
         return null;
     }
 
@@ -195,7 +211,7 @@ class Type<T extends Type.Item> implements StorePT<T> {
      * @return Item.
      */
     @Override
-    public List<T> findAll() {
+    public List<Item> findAll() {
         return null;
     }
 
@@ -207,7 +223,7 @@ class Type<T extends Type.Item> implements StorePT<T> {
      * @return true если успешно
      */
     @Override
-    public boolean replace(final String id, final T item) {
+    public boolean replace(final String id, final Item item) {
         return false;
     }
 
@@ -219,29 +235,46 @@ class Type<T extends Type.Item> implements StorePT<T> {
      * @return the item
      */
     @Override
-    public T findById(final String id) {
+    public Item findById(final String id) {
         return null;
     }
 
-    public static class Item {
-        private Integer id;
-        private String name;
+    /**
+     * Выполнить как-то запрос/команду
+     *
+     * @param query query + строка для вывода в лог
+     */
+    @Override
+    public void doQuery(String... query) {
 
-        Item(final Integer id, final String name) {
-            this.id = id;
-            this.name = name;
-        }
+    }
 
-        /**
-         * Returns a string representation of the object.
-         *
-         * @return a string representation of the object.
-         */
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append(id).append(" ").append(name);
-            return sb.toString();
-        }
+    /**
+     * Display tables by name in List.
+     *
+     * @param list the List<String> of tables
+     */
+    @Override
+    public void displayTables(List<String> list) {
+
+    }
+
+    /**
+     * Set all tables.
+     * Если имеются таблицы, вывести их содержимое
+     *
+     * @return the boolean
+     */
+    @Override
+    public boolean isAnyTable() {
+        return false;
+    }
+
+    /**
+     * truncate Table.
+     */
+    @Override
+    public void truncate() {
+
     }
 }

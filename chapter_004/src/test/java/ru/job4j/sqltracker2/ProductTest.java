@@ -10,10 +10,11 @@ import java.sql.Timestamp;
 import static org.junit.Assert.assertTrue;
 
 public class ProductTest {
-    private static Type<Type.Item> type;
-    private static Product<Product.Item> product;
-    private static Type.Item itemType;
-    private static Product.Item itemProduct;
+    private static SqlTracker2.Item item;
+    //private static Type<Type.Item> type;
+    //private static Product<Product.Item> product;
+    //private static Type.Item itemType;
+    //private static Product.Item itemProduct;
 
     @BeforeClass
     public static void beforeClass() {
