@@ -5,13 +5,21 @@ import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.job4j.sqltracker2.SqlTracker2.Item;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
 
 import static org.junit.Assert.assertTrue;
 
@@ -19,6 +27,9 @@ import static org.junit.Assert.assertTrue;
 public class SqlTracker2Test {
     private static SqlTracker2 type;
     private static SqlTracker2 product;
+    private String fileDb = Objects.requireNonNull(SqlTracker2.class.getClassLoader().
+            getResource("sqltracker.properties")).getFile();
+    private static final Logger LOG = LoggerFactory.getLogger(SqlTracker2Test.class);
 
     @BeforeClass
     public static void beforeClass() throws NoSuchFieldException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, IOException {
@@ -78,5 +89,21 @@ public class SqlTracker2Test {
         boolean items = product.delete("2");
         System.out.println(items);
         product.isAnyTable();
+    }
+
+    private Connection init() {
+        Connection cn = null;
+        try (FileInputStream in = new FileInputStream(fileDb)) {
+            Properties cfg = new Properties();
+            cfg.load(in);
+            Class.forName(cfg.getProperty("jdbc.driver"));
+            cn = DriverManager.getConnection(
+                    cfg.getProperty("jdbc.url"),
+                    cfg.getProperty("jdbc.username"),
+                    cfg.getProperty("jdbc.password"));
+        } catch (IOException | ClassNotFoundException | SQLException e) {
+            LOG.error(e.getMessage(), e);
+        }
+        return cn;
     }
 }
