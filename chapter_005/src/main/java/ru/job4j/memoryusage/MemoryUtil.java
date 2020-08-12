@@ -8,7 +8,9 @@ import javax.management.NotificationEmitter;
 import javax.management.NotificationListener;
 import javax.management.openmbean.CompositeData;
 import java.lang.management.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MemoryUtil {
@@ -18,6 +20,26 @@ public class MemoryUtil {
     private static final long SIZE_GB = SIZE_MB * 1024;
     private static final String SPACES = "                    ";
     private static Map<String, MemRegion> memRegions;
+    private static boolean startTimerGC = false;
+    private static int minor;
+
+    public static List<Long> getMsMinor() {
+        return msMinor;
+    }
+
+    public static List<Long> getMsMajor() {
+        return msMajor;
+    }
+
+    private static int major;
+    private static List<Long> msMinor = new ArrayList<>();
+    private static List<Long> msMajor = new ArrayList<>();
+    //private static long msMinor;
+    //private static long msMajor;
+    private static Map<String, Boolean> typeGen = Map.of(
+            "end of minor GC", true,
+            "end of major GC", false
+    );
 
     protected MemoryUtil() {
         throw new IllegalStateException("Utility class");
@@ -46,7 +68,7 @@ public class MemoryUtil {
 
     static {
         // Запоминаем информацию обо всех регионах памяти
-        memRegions = new HashMap<String, MemRegion>(
+        memRegions = new HashMap<>(
                 ManagementFactory.getMemoryPoolMXBeans().size());
         for (MemoryPoolMXBean mBean : ManagementFactory.getMemoryPoolMXBeans()) {
             memRegions.put(mBean.getName(), new MemRegion(mBean.getName(), mBean.getType() == MemoryType.HEAP));
@@ -69,6 +91,20 @@ public class MemoryUtil {
                 appendMemUsage(sb, memAfter);
                 sb.append("), ").append(gcInfo.getGcInfo().getDuration()).append(" ms]");
                 System.out.println(sb.toString());
+
+                if (startTimerGC) {
+                    if (typeGen.get(gcInfo.getGcAction())) {
+                        if (gcInfo.getGcInfo().getDuration() > 0) {
+                            msMinor.add(gcInfo.getGcInfo().getDuration());
+                            minor++;
+                        }
+                    } else {
+                        if (gcInfo.getGcInfo().getDuration() > 0) {
+                            msMajor.add(gcInfo.getGcInfo().getDuration());
+                            major++;
+                        }
+                    }
+                }
             }
         }
     };
@@ -84,6 +120,8 @@ public class MemoryUtil {
                 printMemUsage(mBean.getName(), mBean.getUsage());
             }
         }
+        //System.out.println(String.format("minor %s/%s  coll/ms", minor, msMinor));
+        //System.out.println(String.format("major %s/%s  coll/ms", major, msMajor));
     }
 
     /**
@@ -93,6 +131,7 @@ public class MemoryUtil {
         for (GarbageCollectorMXBean mBean : ManagementFactory.getGarbageCollectorMXBeans()) {
             ((NotificationEmitter) mBean).addNotificationListener(gcHandler, null, null);
         }
+        startTimerGC = true;
     }
 
     /**
