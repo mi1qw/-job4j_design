@@ -29,9 +29,9 @@ public class UserTest {
         System.out.println(map);
         System.out.println("user1 == user2 ? - " + (user1 == user2));
         System.out.println("user1 equals user2 ? - " + (user1.equals(user2)));
-        System.out.println("user1 equals user2 ? - " + (user1.equals(user3)));
-        System.out.println("user1 equals user2 ? - " + (user1.equals("user3")));
-        System.out.println("user1 equals user2 ? - " + (user1.equals(user1)));
+        System.out.println("user1 equals user3 ? - " + (user1.equals(user3)));
+        System.out.println("user1 equals `user3` ? - " + (user1.equals("user3")));
+        System.out.println("user1 equals user1 ? - " + (user1.equals(user1)));
 
         assertThat(map.get(user2), is("two"));
     }
