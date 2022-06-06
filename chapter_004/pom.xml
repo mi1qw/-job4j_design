@@ -9,17 +9,18 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chapter_004</artifactId>
-    <dependencies>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>3.3.3</version>
-            <scope>compile</scope>
-        </dependency>
-    </dependencies>
+<!--    <dependencies>-->
+<!--        <dependency>-->
+<!--            <groupId>org.mockito</groupId>-->
+<!--            <artifactId>mockito-core</artifactId>-->
+<!--            <version>3.3.3</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--    </dependencies>-->
 
     <properties>
         <db.url>jdbc:postgresql://127.0.0.1:5432/spammer</db.url>
+        <db.urlSqltracker>jdbc:postgresql://127.0.0.1:5432/sqltracker</db.urlSqltracker>
         <db.username>postgres</db.username>
         <db.password>Password12!</db.password>
         <db.driver>org.postgresql.Driver</db.driver>
@@ -30,16 +31,31 @@
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-maven-plugin</artifactId>
                 <version>3.6.2</version>
-                <configuration>
-                    <changeLogFile>${basedir}/master.xml</changeLogFile>
-                    <url>${db.url}</url>
-                    <driver>${db.driver}</driver>
-                    <username>${db.username}</username>
-                    <password>${db.password}</password>
-                </configuration>
                 <executions>
                     <execution>
+                        <configuration>
+                            <changeLogFile>${basedir}/master-sqltracker.xml</changeLogFile>
+                            <url>${db.urlSqltracker}</url>
+                            <driver>${db.driver}</driver>
+                            <username>${db.username}</username>
+                            <password>${db.password}</password>
+                        </configuration>
                         <phase>process-resources</phase>
+                        <id>one</id>
+                        <goals>
+                            <goal>update</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <configuration>
+                            <changeLogFile>${basedir}/master.xml</changeLogFile>
+                            <url>${db.url}</url>
+                            <driver>${db.driver}</driver>
+                            <username>${db.username}</username>
+                            <password>${db.password}</password>
+                        </configuration>
+                        <phase>process-resources</phase>
+                        <id>two</id>
                         <goals>
                             <goal>update</goal>
                         </goals>
